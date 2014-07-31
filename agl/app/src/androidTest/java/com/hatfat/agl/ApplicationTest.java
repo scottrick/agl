@@ -1,4 +1,4 @@
-package agl.hatfat.com.agl;
+package com.hatfat.agl;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
