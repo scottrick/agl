@@ -8,10 +8,18 @@ import android.opengl.GLSurfaceView;
  */
 public class AglSurfaceView extends GLSurfaceView {
 
+    private AglRenderer renderer;
+
     public AglSurfaceView(Context context){
         super(context);
 
         setEGLContextClientVersion(2);
-        setRenderer(new AglRenderer());
+
+        this.renderer = new AglRenderer();
+        setRenderer(renderer);
+    }
+
+    public void setScene(AglScene scene) {
+        this.renderer.setScene(scene);
     }
 }
