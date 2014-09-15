@@ -1,21 +1,16 @@
 #version 100
 
-in vec3 position;
-in vec3 color;
-in vec2 texture;
-
-uniform vec3 overrideColor;
-
-out vec3 vertexColor;
-out vec2 textureCoord;
+attribute vec3 position;
+attribute vec2 texture;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 proj;
 
+varying vec2 textureCoord;
+
 void main()
 {
     gl_Position = proj * view * model * vec4(position, 1.0);
-	vertexColor = overrideColor * color;
 	textureCoord = texture;
 }

@@ -1,23 +1,13 @@
 package com.hatfat.agl.shaders;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.opengl.GLES20;
-import android.opengl.GLSurfaceView;
 import android.util.Log;
 
-import com.hatfat.agl.AglScene;
-
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.IntBuffer;
 
 /**
  * Created by scottrick on 8/7/14.
@@ -33,12 +23,12 @@ public class AglShader {
         compile(context);
     }
 
-    public void destroy() {
+    void destroy() {
         GLES20.glDeleteShader(shader);
         shader = 0;
     }
 
-    public void compile(final Context context) {
+    void compile(final Context context) {
         if (shader != 0) {
             Log.e("AglShader", "Compile error: shader is already compiled.");
             return;
@@ -79,7 +69,7 @@ public class AglShader {
         GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, status, 0);
 
         if (status[0] == GLES20.GL_TRUE) {
-            Log.e("AglShader", filename + " compiled successfully.");
+            Log.d("AglShader", filename + " compiled successfully.");
         }
         else {
             //error

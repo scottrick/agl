@@ -3,6 +3,8 @@ package com.hatfat.agl;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 
+import com.hatfat.agl.shaders.AglShaderManager;
+
 /**
  * Created by scottrick on 7/31/14.
  */
@@ -12,6 +14,9 @@ public class AglSurfaceView extends GLSurfaceView {
 
     public AglSurfaceView(Context context){
         super(context);
+
+        //setup the shader manager with a context
+        AglShaderManager.get().setContext(context);
 
         setEGLContextClientVersion(2);
 

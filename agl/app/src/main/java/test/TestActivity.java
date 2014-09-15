@@ -19,6 +19,6 @@ public class TestActivity extends Activity {
         glSurfaceView = aglSurfaceView;
         setContentView(glSurfaceView);
 
-        aglSurfaceView.setScene(new TestScene(this));
+        aglSurfaceView.setScene(new TestScene());
     }
 }

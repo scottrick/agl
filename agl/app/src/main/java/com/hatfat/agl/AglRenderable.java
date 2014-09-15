@@ -6,5 +6,8 @@ package com.hatfat.agl;
  * Something that can be rendered by opengl
  */
 public interface AglRenderable {
+    public void prepareRender();
     public void render();
+
+    public int getShaderProgram();
 }
