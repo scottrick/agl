@@ -12,23 +12,9 @@ public class AglShaderManager {
     private HashMap<String, AglShaderProgram> programMap;
     private Context context;
 
-    private static AglShaderManager singleton;
-
-    public static AglShaderManager get() {
-        if (singleton == null) {
-            singleton = new AglShaderManager();
-        }
-
-        return singleton;
-    }
-
-    //Need to set a context to use when looking for the shader asset files
-    public void setContext(Context context) {
+    public AglShaderManager(Context context) {
         this.context = context;
-    }
-
-    private AglShaderManager() {
-        programMap = new HashMap();
+        this.programMap = new HashMap();
     }
 
     public AglShaderProgram getShaderProgram(String programName) {
@@ -43,5 +29,10 @@ public class AglShaderManager {
         }
 
         return program;
+    }
+
+    //removes all shader programs
+    public void clearPrograms() {
+        programMap.clear();
     }
 }

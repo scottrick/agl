@@ -1,0 +1,101 @@
+Agl TODO
+---------------------------
+start the actual game repo. 
+
+-texture support
+
+-Need to figure out how I want to handle lighting.  Then create:
+	-texture shader w/ lighting
+	-bump-mapped shader w/ lighting
+	-colored geometry shader w/ lighting
+
+
+-simple particle engine + effects
+
+-3d model loading?
+
+-enable multisampling
+
+-might want to write a custom wrapper class to handle this array management / iterating
+
+
+
+
+GAME IDEA
+---------------------------
+dragon quest (nintendo) overworld like game	
+procedurally generated (with seeds, so you can replay the same map or send it to a friend to play)
+You have two heroes?  Four classes maybe (fighter, mage, archer, healer) and you can have a party of any two 
+
+
+Choose your class; only warrior for start?
+
+story:
+		The Land of Rhyw has fallen on dark times.  The evil [insert random boss monster] and his minions are causing havok across the land.
+		You must seek out and defeat the evil monster and any henchmen that stand in your way!
+
+theme:
+		Fantasy.
+
+setting:
+		Fantasy.
+
+world:
+		A spherical map.  This is generated at the start of the game based on a random seed that can be shared (so a friend can play the same map).  All pre-seeded encounters / events / dungeons should be generated at the start of the game, along with their "random seed".  This way, we don't have to store everything about the world. at startup.  We can save the generation seed for each different part of the map, so when the player arrives at a new dungeon, it will be generated iwth the same seed as anybody else playing the same map.
+
+		The world will be pretty large (maybe a tweakable setting).  The main overworld map will have different terrain types, and features.  
+		Some features might be: houses, farms, towns, castles, trees, ruins, caverns, tunnels, portals, lighthouse, ship, bouy, etc.  Going onto a feature that is interactable will give you options to take.  
+
+		The world will be divided into different sections, or levels.  The number of levels will probably depend on the size of the game chosen at the start.  Probably want some sort of gating method, or indication of challenge, so players don't wander too far before they should.  
+
+		There can also be computer characters on different terrain spaces.  These characters are visible when they are within your sight range.  Most monsters on the map don't move, or if they do, they move very slowly.  
+
+		Wandering monsters and encounters:  when venturing through territory, the player will randomly have to deal different events or attacking characters.  Examples:  "Theif in the night (fail a check, and one piece of equipment is stolen.  Thief is added to the map and you have to go get your item back."  "attacked by monsters in the night", "encounter a hungry peasant who needs food."  Etc.
+
+		Movement on the map can be similar to how pixel dungeon works - quickly move and explore the map, uncovering different places and things to do/fight.
+
+game:
+		Combat is not like pixel dungeon.  Its more like dragon warrior, but with more depth.  
+
+		How the combat screen is laid out:
+
+
+							BOSS MAN
+
+
+					MONSTER4		MONSTER5
+
+
+			MONSTER1		MONSTER2		MONSTER3
+
+
+			----------------------------------------
+
+
+		                     PLAYER
+
+
+		Its important to remember that not all of the monster spaces will have monsters in them every fight.  If you randomly encounter a pack of orcs, there might only be 3 orcs in slots 1, 2, and 4.  The order does matter.  Depending on the action you take, it will affect different monsters.
+
+		For example, a monster is considered "in the front lines" if at least one of the two monsters shielding it are gone.  So for melee attacks (standard sword swings) you can only attack somethign in the front lines.  So if there are three orcs as described above, you can only attack monsters 1 and 2.  Once monster 1 or two is defeated, then monster 4 is considered in the front lines and can be attacked.    Monsters not in the front lines can't attack with melee attacks, but might have spells or arrows they can use.  Same goes for the player; they might not be able to attack with melee against the boss monster with all of his minions defending him, but you can probably use a magic missile spell to hit him.  Other attacks might hit all monsters in the front (frost nova?).  
+
+		Players and monsters take turns taking actions.  Probably have initiative to determine who goes first.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

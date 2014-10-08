@@ -13,9 +13,13 @@ public class AglShaderProgram {
     private AglShader vertShader;
     private AglShader fragShader;
 
+    String hatfat;
+
     public AglShaderProgram(String vertShaderFilename, String fragShaderFilename, Context context) {
         vertShader = new AglShader(vertShaderFilename, context);
         fragShader = new AglShader(fragShaderFilename, context);
+
+        hatfat = fragShaderFilename;
 
         shaderProgram = GLES20.glCreateProgram();
         GLES20.glAttachShader(shaderProgram, vertShader.getShader());
