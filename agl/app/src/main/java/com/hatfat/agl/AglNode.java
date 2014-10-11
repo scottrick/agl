@@ -12,17 +12,28 @@ public class AglNode implements AglUpdateable {
 
     protected AglRenderable renderable;
 
+    protected boolean shouldRender;
+
     protected int numModifiers = 0;
     protected int maxNumModifiers = 8;
     protected Modifier[] modifiers;
     protected int updateInt = 0;
 
     public AglNode(Vec3 position, AglRenderable renderable) {
+        this.shouldRender = true;
         this.posQuat = new PosQuat(position, new Quat());
         this.scale = new Vec3(1.0f, 1.0f, 1.0f);
 
         this.renderable = renderable;
         this.modifiers = new Modifier[maxNumModifiers];
+    }
+
+    public boolean shouldRender() {
+        return shouldRender;
+    }
+
+    public void setShouldRender(boolean newValue) {
+        this.shouldRender = newValue;
     }
 
     //will set the model matrix to the passed in matrix

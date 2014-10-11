@@ -8,6 +8,7 @@ package com.hatfat.agl;
 public interface AglRenderable {
     public void prepareRender(int shaderProgram);
     public void render();
+    public void cleanupRender();
 
     public String getShaderProgramName();
 }

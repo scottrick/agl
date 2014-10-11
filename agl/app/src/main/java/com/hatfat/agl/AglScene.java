@@ -4,6 +4,7 @@ import android.opengl.GLES20;
 import android.util.Log;
 
 import com.hatfat.agl.app.AglRenderer;
+import com.hatfat.agl.util.Color;
 import com.hatfat.agl.util.Matrix;
 import com.hatfat.agl.util.Vec3;
 import com.squareup.otto.Bus;
@@ -45,7 +46,7 @@ public class AglScene implements AglUpdateable {
                 new Vec3(0.0f, 1.0f, 0.0f),
                 60.0f, 1.0f, 0.1f, 1000.0f);
 
-        globalLight = new AglPointLight(new Vec3(0.0f, 0.0f, 1.0f), new Vec3(1.0f, 1.0f, 1.0f));
+        globalLight = new AglPointLight(new Vec3(0.0f, 0.0f, 1.0f), new Color(1.0f, 1.0f, 1.0f, 1.0f));
     }
 
     public void setupScene() {
@@ -163,7 +164,7 @@ public class AglScene implements AglUpdateable {
                 GLES20.glUniformMatrix4fv(projectionUniformLocation, 1, false, projMatrix, 0);
                 GLES20.glUniformMatrix4fv(viewUniformLocation, 1, false, viewMatrix, 0);
                 GLES20.glUniform3f(lightDirUniformLocation, globalLight.lightDir.x, globalLight.lightDir.y, globalLight.lightDir.z);
-                GLES20.glUniform3f(lightColorUniformLocation, globalLight.lightColor.x, globalLight.lightColor.y, globalLight.lightColor.z);
+                GLES20.glUniform4f(lightColorUniformLocation, globalLight.lightColor.r, globalLight.lightColor.g, globalLight.lightColor.b, globalLight.lightColor.a);
             }
 
             currentRenderable.prepareRender(activeProgram);
@@ -171,11 +172,17 @@ public class AglScene implements AglUpdateable {
             List<AglNode> currentNodes = renderableHashMap.get(currentRenderable);
             for (AglNode node : currentNodes) {
                 //render each node of this renderable type
+                if (!node.shouldRender) {
+                    continue;
+                }
+
                 node.getModelMatrix(modelMatrix);
                 GLES20.glUniformMatrix4fv(modelUniformLocation, 1, false, modelMatrix.m, 0);
 
                 currentRenderable.render();
             }
+
+            currentRenderable.cleanupRender();
         }
 
         int error;

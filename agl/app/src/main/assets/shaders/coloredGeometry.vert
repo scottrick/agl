@@ -1,10 +1,10 @@
 #version 100
 
 attribute vec3 position;
-attribute vec3 color;
+attribute vec4 color;
 attribute vec3 normal;
 
-varying vec3 vertexColor;
+varying vec4 vertexColor;
 varying vec3 fragNormal;
 
 uniform mat4 proj;

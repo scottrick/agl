@@ -18,7 +18,7 @@ public class AglRandom {
         return random;
     }
 
-    public Vec3 nextColor() {
-        return new Vec3(random.nextFloat(), random.nextFloat(), random.nextFloat());
+    public Color nextColor() {
+        return new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), 1.0f);
     }
 }

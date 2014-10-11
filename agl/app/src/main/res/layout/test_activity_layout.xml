@@ -13,4 +13,14 @@
         android:layout_width="160dp"
         android:layout_height="48dp" />
 
+    <Button
+        android:id="@+id/test_activity_layout_toggle_button"
+        android:paddingLeft="@dimen/default_padding"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="@string/test_activity_next_mesh_button_text"
+        android:textSize="14dp"
+        android:layout_width="160dp"
+        android:layout_height="48dp" />
+
 </RelativeLayout>

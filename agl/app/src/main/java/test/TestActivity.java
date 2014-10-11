@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
-import com.hatfat.agl.AglScene;
 import com.hatfat.agl.R;
 import com.hatfat.agl.app.AglActivity;
 import com.hatfat.agl.util.AglRandom;
@@ -23,7 +22,7 @@ public class TestActivity extends AglActivity implements View.OnTouchListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final AglScene aglScene = new TestScene();
+        final TestScene aglScene = new TestScene();
         aglSurfaceView.setScene(aglScene);
 
         aglSurfaceView.setOnTouchListener(this);
@@ -37,6 +36,14 @@ public class TestActivity extends AglActivity implements View.OnTouchListener {
             @Override
             public void onClick(View v) {
                 getScene().getGlobalLight().lightColor = rand.nextColor();
+            }
+        });
+
+        Button meshButton = (Button) ourView.findViewById(R.id.test_activity_layout_toggle_button);
+        meshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                aglScene.toggleMesh();
             }
         });
     }

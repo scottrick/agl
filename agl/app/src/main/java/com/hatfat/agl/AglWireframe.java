@@ -7,14 +7,15 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-public class AglColoredGeometry implements AglRenderable {
-
+public class AglWireframe implements AglRenderable {
     private int vbo;
     private int ebo;
 
     private int numElements;
 
-    public AglColoredGeometry(float vertices[], int numVertices, int elements[], int numElements) {
+    private float lineWidth = 1.0f;
+
+    public AglWireframe(float vertices[], int numVertices, int elements[], int numElements) {
         ByteBuffer vbb  = ByteBuffer.allocateDirect(vertices.length * 4);
         vbb.order(ByteOrder.nativeOrder());
         FloatBuffer vertexBuffer = vbb.asFloatBuffer();
@@ -36,44 +37,44 @@ public class AglColoredGeometry implements AglRenderable {
 
         //setup the vbo buffer
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vbo);
-        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, AglDef.SIZEOF_FLOAT * numVertices * 10, vertexBuffer, GLES20.GL_STATIC_DRAW);
+        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, AglDef.SIZEOF_FLOAT * numVertices * 3, vertexBuffer, GLES20.GL_STATIC_DRAW);
 
         //setup ebo
         this.numElements = numElements;
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, ebo);
         GLES20.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER, AglDef.SIZEOF_INT * numElements, indexBuffer, GLES20.GL_STATIC_DRAW);
+
+        float[] lineWidth = new float[2];
+        GLES20.glGetFloatv(GLES20.GL_ALIASED_LINE_WIDTH_RANGE, lineWidth, 0);
+
+        //user lineWidth 2.0f if supported
+        this.lineWidth = Math.min(lineWidth[1], 2.0f);
     }
 
     @Override
     public void prepareRender(int shaderProgram) {
+        GLES20.glLineWidth(lineWidth);
+
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vbo);
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, ebo);
 
         int posAttrib = GLES20.glGetAttribLocation(shaderProgram, "position");
         GLES20.glEnableVertexAttribArray(posAttrib);
-        GLES20.glVertexAttribPointer(posAttrib, 3, GLES20.GL_FLOAT, false, 10 * AglDef.SIZEOF_FLOAT, 0);
-
-        int colorAttrib = GLES20.glGetAttribLocation(shaderProgram, "color");
-        GLES20.glEnableVertexAttribArray(colorAttrib);
-        GLES20.glVertexAttribPointer(colorAttrib, 4, GLES20.GL_FLOAT, false, 10 * AglDef.SIZEOF_FLOAT, 3 * AglDef.SIZEOF_FLOAT);
-
-        int normalAttrib = GLES20.glGetAttribLocation(shaderProgram, "normal");
-        GLES20.glEnableVertexAttribArray(normalAttrib);
-        GLES20.glVertexAttribPointer(normalAttrib, 3, GLES20.GL_FLOAT, false, 10 * AglDef.SIZEOF_FLOAT, 7 * AglDef.SIZEOF_FLOAT);
+        GLES20.glVertexAttribPointer(posAttrib, 3, GLES20.GL_FLOAT, false, 3 * AglDef.SIZEOF_FLOAT, 0);
     }
 
     @Override
     public void render() {
-        GLES20.glDrawElements(GLES20.GL_TRIANGLES, numElements, GLES20.GL_UNSIGNED_INT, 0);
+        GLES20.glDrawElements(GLES20.GL_LINES, numElements, GLES20.GL_UNSIGNED_INT, 0);
     }
 
     @Override
     public void cleanupRender() {
-
+        GLES20.glLineWidth(1.0f);
     }
 
     @Override
     public String getShaderProgramName() {
-        return "shaders/coloredGeometry";
+        return "shaders/wireframe";
     }
 }

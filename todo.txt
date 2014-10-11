@@ -1,6 +1,16 @@
 Agl TODO
 ---------------------------
-start the actual game repo. 
+simple obj file reader (just vertices and faces)
+
+-setup game android project with agl lib
+
+Figure out how we want to handle the GRID of hexes and 12 pentagons.
+ -> need a way to calculate tile coordinates
+ -> Once we have the grid system, we need a new camera which always faces the origin, but can rotate around the sphere (at a specific hex, etc) at different zoom levels.  This camera should let you swipe the map around, like spinning a globe kinda.
+
+Examine the boundaries between AGL and QUEST's repos.
+
+Basic terrain generation?
 
 -texture support
 
