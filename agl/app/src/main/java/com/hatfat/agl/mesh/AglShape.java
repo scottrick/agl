@@ -19,4 +19,8 @@ public class AglShape {
     public List<AglTriangle> getTriangles() {
         return triangles;
     }
+
+    public AglPoint getCenter() {
+        return center;
+    }
 }

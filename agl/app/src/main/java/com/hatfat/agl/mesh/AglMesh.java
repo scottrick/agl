@@ -8,7 +8,8 @@ import java.util.List;
 import test.TestRenderableFactory;
 
 public class AglMesh {
-    protected List<Vec3> points;
+    protected List<AglPoint> points;
+    protected List<AglPoint> startingPoints;
     protected List<AglTriangle> triangles;
 
     public static AglMesh makeIcosahedron() {
@@ -20,7 +21,10 @@ public class AglMesh {
                     TestRenderableFactory.icosahedronVertices[i * 3 + 1],
                     TestRenderableFactory.icosahedronVertices[i * 3 + 2]);
 
-            mesh.points.add(newPoint);
+            AglPoint p = new AglPoint(newPoint);
+
+            mesh.points.add(p);
+            mesh.startingPoints.add(p);
         }
 
         for (int i = 0; i < 20; i++) {
@@ -29,26 +33,28 @@ public class AglMesh {
                     mesh.points.get(TestRenderableFactory.icosahedronElements[i * 3 + 1]),
                     mesh.points.get(TestRenderableFactory.icosahedronElements[i * 3 + 2]));
 
-            mesh.triangles.add(newTriangle);
+            mesh.addTriangle(newTriangle);
+//            mesh.triangles.add(newTriangle);
         }
 
         return mesh;
     }
 
     public AglMesh() {
-        points = new LinkedList<Vec3>();
-        triangles = new LinkedList<AglTriangle>();
+        points = new LinkedList();
+        startingPoints = new LinkedList();
+        triangles = new LinkedList();
     }
 
     public float[] getVertexArray() {
         float[] vertices = new float[points.size() * 3];
 
         for (int i = 0; i < points.size(); i++) {
-            Vec3 point = points.get(i);
+            AglPoint point = points.get(i);
 
-            vertices[i * 3 + 0] = point.x;
-            vertices[i * 3 + 1] = point.y;
-            vertices[i * 3 + 2] = point.z;
+            vertices[i * 3 + 0] = point.p.x;
+            vertices[i * 3 + 1] = point.p.y;
+            vertices[i * 3 + 2] = point.p.z;
         }
 
         return vertices;
@@ -163,18 +169,53 @@ public class AglMesh {
             }
         }
 
-        return newMesh;
+        AglMesh finalMesh = new AglMesh();
+
+        //MAKE THE FINAL mesh with new point/triangle objects for everything
+        for (AglPoint point : newMesh.points) {
+            finalMesh.addPoint(new AglPoint(point));
+        }
+
+        for (AglPoint point : startingPoints) {
+            finalMesh.startingPoints.add(finalMesh.pointAtIndex(finalMesh.indexForPoint(point)));
+        }
+
+        for (AglTriangle triangle : newMesh.triangles) {
+            int indexA = finalMesh.points.indexOf(triangle.pointA);
+            int indexB = finalMesh.points.indexOf(triangle.pointB);
+            int indexC = finalMesh.points.indexOf(triangle.pointC);
+
+            AglPoint pointA = finalMesh.points.get(indexA);
+            AglPoint pointB = finalMesh.points.get(indexB);
+            AglPoint pointC = finalMesh.points.get(indexC);
+
+            finalMesh.addTriangle(new AglTriangle(pointA, pointB, pointC));
+        }
+
+        return finalMesh;
     }
 
     //adds a point if its not already in the list
-    private void addPoint(Vec3 point) {
+    private void addPoint(AglPoint point) {
         if (!points.contains(point)) {
             points.add(point);
         }
     }
 
-    public int indexForPoint(Vec3 point) {
+    private void addTriangle(AglTriangle triangle) {
+        triangles.add(triangle);
+
+        triangle.pointA.addTriangle(triangle);
+        triangle.pointB.addTriangle(triangle);
+        triangle.pointC.addTriangle(triangle);
+    }
+
+    public int indexForPoint(AglPoint point) {
         return points.indexOf(point);
+    }
+
+    public AglPoint pointAtIndex(int index) {
+        return points.get(index);
     }
 
     public AglTriangle getTriangle(int index) {

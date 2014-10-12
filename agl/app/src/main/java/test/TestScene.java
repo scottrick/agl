@@ -1,6 +1,7 @@
 package test;
 
 import android.opengl.GLES20;
+import android.util.Log;
 
 import com.hatfat.agl.AglCamera;
 import com.hatfat.agl.AglNode;
@@ -42,13 +43,13 @@ public class TestScene extends AglScene {
         GLES20.glPolygonOffset(1.0f, 1.0f);
 
         activeNodeIndex = 0;
-        int numTestNodes = 6;
+        int numTestNodes = 5;
         wireframeNodes = new AglNode[numTestNodes];
         meshNodes = new AglNode[numTestNodes];
 
         Vec3 spinVec = new Vec3(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
         AglMesh testMesh = null;
-        float rotateSpeed = 20.0f;
+        float rotateSpeed = 60.0f;
 
         for (int i = 0; i < numTestNodes; i++) {
             if (testMesh == null) {
@@ -62,7 +63,16 @@ public class TestScene extends AglScene {
 
             AglRenderable wireframeRenderable = TestRenderableFactory.createWireFrameFromTriangles(testMesh.getVertexArray(), testMesh.getNumVertices(), testMesh.getIndexArray(), testMesh.getNumTriangles());
             AglRenderable meshRenderable = TestRenderableFactory.createColoredRenderableFromMesh(testMesh);
-            AglRenderable pentagonRenderable = TestRenderableFactory.createWireFrameFromTriangles(shapeMesh.getVertexArray(), shapeMesh.getNumVertices(), shapeMesh.getIndexArray(), shapeMesh.getNumTriangles());
+
+            float[] testVertices = shapeMesh.getVertexArray();
+            int numVertices = shapeMesh.getNumVertices();
+            int[] testIndices = shapeMesh.getIndexArray();
+            int numTriangles = shapeMesh.getNumTriangles();
+
+            Log.e("catfat", testVertices.length + ", " + numVertices + ", " + testIndices.length + ", " + numTriangles);
+
+//            AglRenderable pentagonRenderable = TestRenderableFactory.createWireFrameFromTriangles(testVertices, numVertices, testIndices, numTriangles);
+            AglRenderable pentagonRenderable = shapeMesh.createWireframe();
 
             AglNode meshNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), meshRenderable);
             meshNode.addModifier(new SpinModifier(meshNode, rotateSpeed, spinVec));
@@ -70,7 +80,7 @@ public class TestScene extends AglScene {
             meshNodes[i] = meshNode;
             addNode(meshNode);
 
-            AglNode wireframeNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), wireframeRenderable);
+            AglNode wireframeNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), pentagonRenderable);
             wireframeNode.addModifier(new SpinModifier(wireframeNode, rotateSpeed, spinVec));
             wireframeNode.setShouldRender(false);
             wireframeNodes[i] = wireframeNode;

@@ -14,6 +14,12 @@ public class Vec3 {
         this.z = z;
     }
 
+    public Vec3(final Vec3 other) {
+        this.x = other.x;
+        this.y = other.y;
+        this.z = other.z;
+    }
+
     public void normalize() {
         //scratch is MAGNITUDE
         scratch = (x * x) + (y * y) + (z * z);
@@ -27,5 +33,28 @@ public class Vec3 {
         x *= scratch;
         y *= scratch;
         z *= scratch;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Vec3)) {
+            return false;
+        }
+
+        if (o == this) {
+            return true;
+        }
+
+        Vec3 point = (Vec3) o;
+
+        return (
+                this.x == point.x &&
+                this.y == point.y &&
+                this.z == point.z);
+    }
+
+    @Override
+    public int hashCode() {
+        return (int)this.x * 3 + (int)this.y * 4 + (int)this.z * 5;
     }
 }

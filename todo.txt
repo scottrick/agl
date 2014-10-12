@@ -1,5 +1,9 @@
 Agl TODO
 ---------------------------
+rotate for a while and the two meshes get out of sync
+JOE's phone doesn't work right
+
+
 simple obj file reader (just vertices and faces)
 
 -setup game android project with agl lib

@@ -5,6 +5,7 @@ import com.hatfat.agl.util.Vec3;
 import java.util.LinkedList;
 import java.util.List;
 
+//a point object used when generating the hex meshes
 public class AglPoint {
     public Vec3 p;
     public List<AglTriangle> triangles;
