@@ -1,11 +1,11 @@
-package com.hatfat.agl.mesh;
+package meshgen;
 
-import com.hatfat.agl.util.Vec3;
+import meshgen.Vec3;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import test.TestRenderableFactory;
+import meshgen.TestRenderableFactory;
 
 public class AglMesh {
     protected List<AglPoint> points;
@@ -82,7 +82,16 @@ public class AglMesh {
     }
 
     public void setupTriangleNeighbors() {
+        System.out.println("setupTriangleNeighbors");
+        int hack = 0;
+
         for (AglTriangle triangle : triangles) {
+
+            hack++;
+            if (hack % 500 == 0) {
+                System.out.println(triangles.indexOf(triangle) + " / " + triangles.size());
+            }
+
             for (AglTriangle tri : triangles) {
                 if (tri == triangle) {
                     continue;

@@ -1,7 +1,6 @@
 package test;
 
 import android.opengl.GLES20;
-import android.util.Log;
 
 import com.hatfat.agl.AglCamera;
 import com.hatfat.agl.AglNode;
@@ -48,8 +47,10 @@ public class TestScene extends AglScene {
         meshNodes = new AglNode[numTestNodes];
 
         Vec3 spinVec = new Vec3(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
+        spinVec.normalize();
+
         AglMesh testMesh = null;
-        float rotateSpeed = 60.0f;
+        float rotateSpeed = 4.0f;
 
         for (int i = 0; i < numTestNodes; i++) {
             if (testMesh == null) {
@@ -63,15 +64,6 @@ public class TestScene extends AglScene {
 
             AglRenderable wireframeRenderable = TestRenderableFactory.createWireFrameFromTriangles(testMesh.getVertexArray(), testMesh.getNumVertices(), testMesh.getIndexArray(), testMesh.getNumTriangles());
             AglRenderable meshRenderable = TestRenderableFactory.createColoredRenderableFromMesh(testMesh);
-
-            float[] testVertices = shapeMesh.getVertexArray();
-            int numVertices = shapeMesh.getNumVertices();
-            int[] testIndices = shapeMesh.getIndexArray();
-            int numTriangles = shapeMesh.getNumTriangles();
-
-            Log.e("catfat", testVertices.length + ", " + numVertices + ", " + testIndices.length + ", " + numTriangles);
-
-//            AglRenderable pentagonRenderable = TestRenderableFactory.createWireFrameFromTriangles(testVertices, numVertices, testIndices, numTriangles);
             AglRenderable pentagonRenderable = shapeMesh.createWireframe();
 
             AglNode meshNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), meshRenderable);

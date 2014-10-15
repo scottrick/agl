@@ -1,6 +1,4 @@
-package com.hatfat.agl.mesh;
-
-import com.hatfat.agl.AglWireframe;
+package meshgen;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -45,7 +43,15 @@ public class AglShapeMesh {
         List<AglShape> shapesToCheck = new LinkedList();
         shapesToCheck.addAll(shapeMesh.pentagons);
 
+        int hack = 0;
+
         while (shapesToCheck.size() > 0) {
+            hack++;
+
+            if (hack % 500 == 0) {
+                System.out.println("  --> shapes left " + shapesToCheck.size());
+            }
+
             AglShape shape = shapesToCheck.get(0);
 
             for (AglTriangle triangle : shape.getTriangles()) {
@@ -146,72 +152,72 @@ public class AglShapeMesh {
         return hexagons.size();
     }
 
-    public AglWireframe createWireframe() {
-        float[] vertexArray = getVertexArray();
-        int numVertices = getNumVertices();
+    // public AglWireframe createWireframe() {
+    //     float[] vertexArray = getVertexArray();
+    //     int numVertices = getNumVertices();
 
-        int[] indicesArray = new int[pentagons.size() * 5 * 2 + hexagons.size() * 6 * 2];
+    //     int[] indicesArray = new int[pentagons.size() * 5 * 2 + hexagons.size() * 6 * 2];
 
-        for (int i = 0; i < pentagons.size(); i++) {
-            AglShape pentagon = pentagons.get(i);
+    //     for (int i = 0; i < pentagons.size(); i++) {
+    //         AglShape pentagon = pentagons.get(i);
 
-            int currentIndex = 0;
+    //         int currentIndex = 0;
 
-            for (int j = 0; j < pentagon.getTriangles().size(); j++) {
-                AglTriangle triangle = pentagon.getTriangles().get(j);
+    //         for (int j = 0; j < pentagon.getTriangles().size(); j++) {
+    //             AglTriangle triangle = pentagon.getTriangles().get(j);
 
-                if (!triangle.pointA.equals(pentagon.getCenter())) {
-                    int index = points.indexOf(triangle.pointA);
-                    indicesArray[i * 10 + currentIndex] = index;
-                    currentIndex++;
-                }
+    //             if (!triangle.pointA.equals(pentagon.getCenter())) {
+    //                 int index = points.indexOf(triangle.pointA);
+    //                 indicesArray[i * 10 + currentIndex] = index;
+    //                 currentIndex++;
+    //             }
 
-                if (!triangle.pointB.equals(pentagon.getCenter())) {
-                    int index = points.indexOf(triangle.pointB);
-                    indicesArray[i * 10 + currentIndex] = index;
-                    currentIndex++;
-                }
+    //             if (!triangle.pointB.equals(pentagon.getCenter())) {
+    //                 int index = points.indexOf(triangle.pointB);
+    //                 indicesArray[i * 10 + currentIndex] = index;
+    //                 currentIndex++;
+    //             }
 
-                if (!triangle.pointC.equals(pentagon.getCenter())) {
-                    int index = points.indexOf(triangle.pointC);
-                    indicesArray[i * 10 + currentIndex] = index;
-                    currentIndex++;
-                }
-            }
-        }
+    //             if (!triangle.pointC.equals(pentagon.getCenter())) {
+    //                 int index = points.indexOf(triangle.pointC);
+    //                 indicesArray[i * 10 + currentIndex] = index;
+    //                 currentIndex++;
+    //             }
+    //         }
+    //     }
 
-        for (int i = 0; i < hexagons.size(); i++) {
-            AglShape hexagon = hexagons.get(i);
+    //     for (int i = 0; i < hexagons.size(); i++) {
+    //         AglShape hexagon = hexagons.get(i);
 
-            int currentIndex = 0;
+    //         int currentIndex = 0;
 
-            for (int j = 0; j < hexagon.getTriangles().size(); j++) {
-                AglTriangle triangle = hexagon.getTriangles().get(j);
+    //         for (int j = 0; j < hexagon.getTriangles().size(); j++) {
+    //             AglTriangle triangle = hexagon.getTriangles().get(j);
 
-                if (!triangle.pointA.equals(hexagon.getCenter())) {
-                    int index = points.indexOf(triangle.pointA);
-                    indicesArray[i * 12 + currentIndex] = index;
-                    currentIndex++;
-                }
+    //             if (!triangle.pointA.equals(hexagon.getCenter())) {
+    //                 int index = points.indexOf(triangle.pointA);
+    //                 indicesArray[i * 12 + currentIndex] = index;
+    //                 currentIndex++;
+    //             }
 
-                if (!triangle.pointB.equals(hexagon.getCenter())) {
-                    int index = points.indexOf(triangle.pointB);
-                    indicesArray[i * 12 + currentIndex] = index;
-                    currentIndex++;
-                }
+    //             if (!triangle.pointB.equals(hexagon.getCenter())) {
+    //                 int index = points.indexOf(triangle.pointB);
+    //                 indicesArray[i * 12 + currentIndex] = index;
+    //                 currentIndex++;
+    //             }
 
-                if (!triangle.pointC.equals(hexagon.getCenter())) {
-                    int index = points.indexOf(triangle.pointC);
-                    indicesArray[i * 12 + currentIndex] = index;
-                    currentIndex++;
-                }
-            }
-        }
+    //             if (!triangle.pointC.equals(hexagon.getCenter())) {
+    //                 int index = points.indexOf(triangle.pointC);
+    //                 indicesArray[i * 12 + currentIndex] = index;
+    //                 currentIndex++;
+    //             }
+    //         }
+    //     }
 
-        AglWireframe wireframe = new AglWireframe(vertexArray, numVertices, indicesArray, indicesArray.length);
+    //     AglWireframe wireframe = new AglWireframe(vertexArray, numVertices, indicesArray, indicesArray.length);
 
-        return wireframe;
-    }
+    //     return wireframe;
+    // }
 
     public float[] getOutlineVertexArray() {
         float[] vertexArray = new float[pentagons.size() * 5 * 2 * 3];

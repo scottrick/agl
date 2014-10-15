@@ -1,17 +1,20 @@
 package com.hatfat.agl.util;
 
 public class Quat {
-    public float x = 0.0f;
-    public float y = 0.0f;
-    public float z = 0.0f;
-    public float w = 1.0f;
+    public float x;
+    public float y;
+    public float z;
+    public float w;
 
     //used in calculations
     private float scratch;
     private Quat scratchQuat = null;
 
     public Quat() {
-
+        this.x = 0.0f;
+        this.y = 0.0f;
+        this.z = 0.0f;
+        this.w = 1.0f;
     }
 
     public Quat(final float x, final float y, final float z, final float w) {
@@ -37,10 +40,18 @@ public class Quat {
     }
 
     public void normalize() {
+        boolean normalizeResult = normalizeWork();
+
+        while (normalizeResult) {
+            normalizeResult = normalizeWork();
+        }
+    }
+
+    private boolean normalizeWork() {
         scratch = (w * w) + (x * x) + (y * y) + (z * z);
 
         if (Math.abs(scratch - 1.0f) < Util.NORMALIZATION_ALLOWABLE_ERROR) {
-            return;
+            return false;
         }
 
         scratch	= Util.invSqrt(scratch);
@@ -49,6 +60,8 @@ public class Quat {
         x = x * scratch;
         y = y * scratch;
         z = z * scratch;
+
+        return true;
     }
 
     public void toMatrix(Matrix matrix) {

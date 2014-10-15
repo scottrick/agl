@@ -7,20 +7,15 @@ import com.hatfat.agl.app.AglRenderer;
 import com.hatfat.agl.util.Color;
 import com.hatfat.agl.util.Matrix;
 import com.hatfat.agl.util.Vec3;
-import com.squareup.otto.Bus;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 /**
  * Created by scottrick on 7/31/14.
  */
 public class AglScene implements AglUpdateable {
-
-    @Inject protected Bus bus;
 
     protected AglCamera camera;
     protected HashMap<AglRenderable, List<AglNode>> renderableHashMap;

@@ -1,15 +1,13 @@
 Agl TODO
 ---------------------------
-rotate for a while and the two meshes get out of sync
-JOE's phone doesn't work right
-
+JOE's phone doesn't work right (Galaxy Nexus 4.2.2)
 
 simple obj file reader (just vertices and faces)
 
 -setup game android project with agl lib
 
 Figure out how we want to handle the GRID of hexes and 12 pentagons.
- -> need a way to calculate tile coordinates
+ -> need a way to calculate tile coordinates (looks like some sort of polar coordinates will work?)
  -> Once we have the grid system, we need a new camera which always faces the origin, but can rotate around the sphere (at a specific hex, etc) at different zoom levels.  This camera should let you swipe the map around, like spinning a globe kinda.
 
 Examine the boundaries between AGL and QUEST's repos.
@@ -23,6 +21,7 @@ Basic terrain generation?
 	-bump-mapped shader w/ lighting
 	-colored geometry shader w/ lighting
 
+-glGetError is SLOW.  Only do it in debug builds (not release builds).
 
 -simple particle engine + effects
 

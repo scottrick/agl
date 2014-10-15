@@ -8,4 +8,8 @@ public class PosQuat {
         this.pos = pos;
         this.quat = quat;
     }
+
+    public String toString() {
+        return "pos (" + pos.x + ", " + pos.y + ", " + pos.z + "), quat (" + quat.x + ", " + quat.y + ", " + quat.z + ", " + quat.w + ")";
+    }
 }

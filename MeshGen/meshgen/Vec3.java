@@ -1,4 +1,6 @@
-package com.hatfat.agl.util;
+package meshgen;
+
+import meshgen.Util;
 
 public class Vec3 {
     public float x;

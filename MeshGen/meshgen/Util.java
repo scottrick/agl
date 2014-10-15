@@ -1,4 +1,4 @@
-package com.hatfat.agl.util;
+package meshgen;
 
 public class Util {
 

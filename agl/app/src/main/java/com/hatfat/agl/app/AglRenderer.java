@@ -173,11 +173,13 @@ public class AglRenderer implements GLSurfaceView.Renderer {
         String renderer = GLES20.glGetString(GLES20.GL_RENDERER);
         String vendor = GLES20.glGetString(GLES20.GL_VENDOR);
         String shaderLang = GLES20.glGetString(GLES20.GL_SHADING_LANGUAGE_VERSION);
+        String extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS);
 
         Log.i("AglRenderer", "GL_VERSION: " + version);
         Log.i("AglRenderer", "GL_RENDERER: " + renderer);
         Log.i("AglRenderer", "GL_VENDOR: " + vendor);
         Log.i("AglRenderer", "GL_SHADERLANG: " + shaderLang);
+        Log.i("AglRenderer", "GL_EXTENSIONS: " + extensions);
     }
 
     public void aglResume() {
