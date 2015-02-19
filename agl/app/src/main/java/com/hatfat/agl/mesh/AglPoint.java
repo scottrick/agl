@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 //a point object used when generating the hex meshes
-public class AglPoint {
+public class AglPoint implements Comparable<AglPoint> {
     public Vec3 p;
     public List<AglTriangle> triangles;
 
@@ -45,5 +45,25 @@ public class AglPoint {
     @Override
     public int hashCode() {
         return (int)this.p.x * 3 + (int)this.p.y * 4 + (int)this.p.z * 5;
+    }
+
+    @Override public int compareTo(AglPoint another) {
+        if (this == another) {
+            return 0;
+        }
+
+        if (this.p.x != another.p.x) {
+            return Float.compare(this.p.x, another.p.x);
+        }
+
+        if (this.p.y != another.p.y) {
+            return Float.compare(this.p.y, another.p.y);
+        }
+
+        if (this.p.z != another.p.z) {
+            return Float.compare(this.p.z, another.p.z);
+        }
+
+        return 0;
     }
 }

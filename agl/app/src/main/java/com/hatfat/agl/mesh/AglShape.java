@@ -9,7 +9,7 @@ public class AglShape {
 
     public AglShape(AglPoint center) {
         this.center = center;
-        this.triangles = new LinkedList<AglTriangle>();
+        this.triangles = new LinkedList<>();
     }
 
     public void addTriangle(AglTriangle triangle) {

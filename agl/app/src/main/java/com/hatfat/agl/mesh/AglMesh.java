@@ -2,8 +2,10 @@ package com.hatfat.agl.mesh;
 
 import com.hatfat.agl.util.Vec3;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import test.TestRenderableFactory;
 
@@ -82,22 +84,42 @@ public class AglMesh {
     }
 
     public void setupTriangleNeighbors() {
+        Set<AglTriangle> trianglesToCheck = new HashSet<AglTriangle>();
+
         for (AglTriangle triangle : triangles) {
-            for (AglTriangle tri : triangles) {
+            trianglesToCheck.clear();
+
+            trianglesToCheck.addAll(triangle.pointA.triangles);
+            trianglesToCheck.addAll(triangle.pointB.triangles);
+            trianglesToCheck.addAll(triangle.pointC.triangles);
+
+            for (AglTriangle tri : trianglesToCheck) {
                 if (tri == triangle) {
                     continue;
                 }
 
-                if (tri.containsPoint(triangle.pointA) && tri.containsPoint(triangle.pointB)) {
-                    triangle.neighborAB = tri;
+                if (triangle.neighborAB == null) {
+                    //still looking for the AB neighbor
+                    if (tri.containsPoint(triangle.pointA) && tri.containsPoint(triangle.pointB)) {
+                        triangle.neighborAB = tri;
+                        continue;
+                    }
                 }
 
-                if (tri.containsPoint(triangle.pointB) && tri.containsPoint(triangle.pointC)) {
-                    triangle.neighborBC = tri;
+                if (triangle.neighborBC == null) {
+                    //still looking for the BC neighbor
+                    if (tri.containsPoint(triangle.pointB) && tri.containsPoint(triangle.pointC)) {
+                        triangle.neighborBC = tri;
+                        continue;
+                    }
                 }
 
-                if (tri.containsPoint(triangle.pointC) && tri.containsPoint(triangle.pointA)) {
-                    triangle.neighborCA = tri;
+                if (triangle.neighborCA == null) {
+                    //still looking for the CA neighbor
+                    if (tri.containsPoint(triangle.pointC) && tri.containsPoint(triangle.pointA)) {
+                        triangle.neighborCA = tri;
+                        continue;
+                    }
                 }
             }
         }

@@ -1,22 +1,36 @@
 package com.hatfat.agl.mesh;
 
 import com.hatfat.agl.AglWireframe;
+import com.hatfat.agl.util.Vec3;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class AglShapeMesh {
+
     private List<AglShape> hexagons;
     private List<AglShape> pentagons;
 
-    private List<AglPoint> points;
+    private Set<AglPoint> points;
+
+    private AglPoint[] cachedPointsArray;
 
     public AglShapeMesh() {
-        this.hexagons = new LinkedList();
-        this.pentagons = new LinkedList();
+        this.hexagons = new LinkedList<>();
+        this.pentagons = new LinkedList<>();
 
-        this.points = new LinkedList();
+        this.points = new TreeSet<>();
     }
 
     public static AglShapeMesh makeFromMesh(AglMesh mesh) {
@@ -36,13 +50,13 @@ public class AglShapeMesh {
             shapeMesh.pentagons.add(pentagon);
         }
 
-        HashSet<AglTriangle> usedTriangles = new HashSet();
+        HashSet<AglTriangle> usedTriangles = new HashSet<>();
 
         for (AglShape pentagon : shapeMesh.pentagons) {
             usedTriangles.addAll(pentagon.getTriangles());
         }
 
-        List<AglShape> shapesToCheck = new LinkedList();
+        List<AglShape> shapesToCheck = new LinkedList<>();
         shapesToCheck.addAll(shapeMesh.pentagons);
 
         while (shapesToCheck.size() > 0) {
@@ -107,6 +121,9 @@ public class AglShapeMesh {
     private void addPoint(AglPoint point) {
         if (!points.contains(point)) {
             points.add(point);
+
+            //cachedPointsArray needs to be updated
+            cachedPointsArray = null;
         }
     }
 
@@ -116,11 +133,21 @@ public class AglShapeMesh {
         addPoint(triangle.pointC);
     }
 
+    private AglPoint[] getAglPointArray() {
+        if (cachedPointsArray == null) {
+            cachedPointsArray = new AglPoint[points.size()];
+            cachedPointsArray = points.toArray(cachedPointsArray);
+        }
+
+        return cachedPointsArray;
+    }
+
     public float[] getVertexArray() {
         float[] vertexArray = new float[points.size() * 3];
+        AglPoint[] pointArray = getAglPointArray();
 
-        for (int i = 0; i < points.size(); i++) {
-            AglPoint point = points.get(i);
+        for (int i = 0; i < pointArray.length; i++) {
+            AglPoint point = pointArray[i];
 
             vertexArray[i * 3 + 0] = point.p.x;
             vertexArray[i * 3 + 1] = point.p.y;
@@ -146,7 +173,13 @@ public class AglShapeMesh {
         return hexagons.size();
     }
 
+    public int getNumPoints() {
+        return points.size();
+    }
+
     public AglWireframe createWireframe() {
+        List<AglPoint> pointList = Arrays.asList(getAglPointArray());
+
         float[] vertexArray = getVertexArray();
         int numVertices = getNumVertices();
 
@@ -161,19 +194,19 @@ public class AglShapeMesh {
                 AglTriangle triangle = pentagon.getTriangles().get(j);
 
                 if (!triangle.pointA.equals(pentagon.getCenter())) {
-                    int index = points.indexOf(triangle.pointA);
+                    int index = pointList.indexOf(triangle.pointA);
                     indicesArray[i * 10 + currentIndex] = index;
                     currentIndex++;
                 }
 
                 if (!triangle.pointB.equals(pentagon.getCenter())) {
-                    int index = points.indexOf(triangle.pointB);
+                    int index = pointList.indexOf(triangle.pointB);
                     indicesArray[i * 10 + currentIndex] = index;
                     currentIndex++;
                 }
 
                 if (!triangle.pointC.equals(pentagon.getCenter())) {
-                    int index = points.indexOf(triangle.pointC);
+                    int index = pointList.indexOf(triangle.pointC);
                     indicesArray[i * 10 + currentIndex] = index;
                     currentIndex++;
                 }
@@ -189,19 +222,19 @@ public class AglShapeMesh {
                 AglTriangle triangle = hexagon.getTriangles().get(j);
 
                 if (!triangle.pointA.equals(hexagon.getCenter())) {
-                    int index = points.indexOf(triangle.pointA);
+                    int index = pointList.indexOf(triangle.pointA);
                     indicesArray[i * 12 + currentIndex] = index;
                     currentIndex++;
                 }
 
                 if (!triangle.pointB.equals(hexagon.getCenter())) {
-                    int index = points.indexOf(triangle.pointB);
+                    int index = pointList.indexOf(triangle.pointB);
                     indicesArray[i * 12 + currentIndex] = index;
                     currentIndex++;
                 }
 
                 if (!triangle.pointC.equals(hexagon.getCenter())) {
-                    int index = points.indexOf(triangle.pointC);
+                    int index = pointList.indexOf(triangle.pointC);
                     indicesArray[i * 12 + currentIndex] = index;
                     currentIndex++;
                 }
@@ -213,49 +246,193 @@ public class AglShapeMesh {
         return wireframe;
     }
 
-    public float[] getOutlineVertexArray() {
-        float[] vertexArray = new float[pentagons.size() * 5 * 2 * 3];
-
-        for (AglShape pentagon : pentagons) {
-            for (AglTriangle triangle : pentagon.getTriangles()) {
-
-            }
-        }
-
-        for (int i = 0; i < points.size(); i++) {
-            AglPoint point = points.get(i);
-
-            vertexArray[i * 3 + 0] = point.p.x;
-            vertexArray[i * 3 + 1] = point.p.y;
-            vertexArray[i * 3 + 2] = point.p.z;
-        }
-
-        return vertexArray;
-    }
-
     public int getNumVertices() {
         return points.size();
     }
 
-    public int[] getIndexArray() {
-        int[] indexArray = new int[pentagons.size() * 3 * 5];
+    public void writeToDiskAsStrings(String filename) throws IOException {
+        FileWriter out = null;
 
-        for (int i = 0; i < pentagons.size(); i++) {
-            AglShape shape = pentagons.get(i);
+        try {
+            out = new FileWriter(filename);
 
-            for (int j = 0; j < shape.getTriangles().size(); j++) {
-                AglTriangle triangle = shape.getTriangles().get(j);
+            AglPoint[] pointArray = getAglPointArray();
+            List<AglPoint> pointList = Arrays.asList(pointArray);
 
-                indexArray[i * 3 * 5 + j * 3 + 0] = points.indexOf(triangle.pointA);
-                indexArray[i * 3 * 5 + j * 3 + 1] = points.indexOf(triangle.pointB);
-                indexArray[i * 3 * 5 + j * 3 + 2] = points.indexOf(triangle.pointC);
+            for (int i = 0; i < pointArray.length; i++) {
+                AglPoint point = pointArray[i];
+                out.write("p " + point.p.x + " " + point.p.y + " " + point.p.z + "\n");
+            }
+
+            List<AglShape> shapes = new LinkedList<>();
+            shapes.addAll(pentagons);
+            shapes.addAll(hexagons);
+
+            for (AglShape shape : shapes) {
+                out.write("s " + shape.getTriangles().size() + "\n");
+
+                for (AglTriangle triangle : shape.getTriangles()) {
+                    out.write("t "
+                            + pointList.indexOf(triangle.pointA) + " "
+                            + pointList.indexOf(triangle.pointB) + " "
+                            + pointList.indexOf(triangle.pointC) + "\n");
+                }
             }
         }
-
-        return indexArray;
+        catch (IOException e) {
+            System.out.println(e);
+        }
+        finally {
+            if (out != null) {
+                out.close();
+            }
+        }
     }
 
-    public int getNumTriangles() {
-        return pentagons.size() * 5;
+    private final byte POINT = 1;
+    private final byte SHAPE = 2;
+    private final byte TRIANGLE = 3;
+
+    public void writeToDiskAsBytes(String filename) throws IOException {
+        FileOutputStream fileOutputStream = null;
+        DataOutputStream out = null;
+
+        try {
+            fileOutputStream = new FileOutputStream(filename);
+            out = new DataOutputStream(fileOutputStream);
+
+            AglPoint[] pointArray = getAglPointArray();
+            List<AglPoint> pointList = Arrays.asList(pointArray);
+
+            for (int i = 0; i < pointArray.length; i++) {
+                AglPoint point = pointArray[i];
+
+                out.writeByte(POINT);
+                out.writeFloat(point.p.x);
+                out.writeFloat(point.p.y);
+                out.writeFloat(point.p.z);
+            }
+
+            List<AglShape> shapes = new LinkedList<>();
+            shapes.addAll(pentagons);
+            shapes.addAll(hexagons);
+
+            for (AglShape shape : shapes) {
+                out.writeByte(SHAPE);
+                out.writeInt(shape.getTriangles().size());
+
+                for (AglTriangle triangle : shape.getTriangles()) {
+                    out.writeByte(TRIANGLE);
+                    out.writeInt(pointList.indexOf(triangle.pointA));
+                    out.writeInt(pointList.indexOf(triangle.pointB));
+                    out.writeInt(pointList.indexOf(triangle.pointC));
+                }
+            }
+        }
+        catch (IOException e) {
+            System.out.println(e);
+        }
+        finally {
+            if (out != null) {
+                out.close();
+            }
+        }
     }
+
+    public void readFromDiskAsBytes(String filename) throws IOException {
+        FileInputStream fileInputStream = null;
+        DataInputStream in = null;
+
+        try {
+            fileInputStream = new FileInputStream(filename);
+            in = new DataInputStream(fileInputStream);
+
+            while (true) {
+                byte dataType = in.readByte();
+
+                switch (dataType) {
+                    case POINT:
+                    {
+                        float x = in.readFloat();
+                        float y = in.readFloat();
+                        float z = in.readFloat();
+                        AglPoint point = new AglPoint(new Vec3(x, y, z));
+                        points.add(point);
+                    }
+                        break;
+                    case SHAPE:
+                    {
+                        int numTriangles = in.readInt();
+
+                        //read in each triangle
+                        for (int i = 0; i < numTriangles; i++) {
+                            dataType = in.readByte();
+
+                            if (dataType != TRIANGLE) {
+                                throw new RuntimeException("MUST BE A TRIANGLE");
+                            }
+
+                            int triA = in.readInt();
+                            int triB = in.readInt();
+                            int triC = in.readInt();
+
+//                            AglTriangle triangle = new AglTriangle()
+                        }
+                    }
+                        break;
+                    default:
+                        throw new RuntimeException("Shouldn't happen!");
+                }
+            }
+        }
+        catch (EOFException e) {
+            //end of file, we are done!
+        }
+        catch (IOException e) {
+            System.out.println(e);
+        }
+        finally {
+            if (in != null) {
+                in.close();
+            }
+        }
+    }
+
+//    public float[] getOutlineVertexArray() {
+//        float[] vertexArray = new float[pentagons.size() * 5 * 2 * 3];
+//
+//        for (AglShape pentagon : pentagons) {
+//            for (AglTriangle triangle : pentagon.getTriangles()) {
+//
+//            }
+//        }
+//
+//        for (int i = 0; i < points.size(); i++) {
+//            AglPoint point = points.get(i);
+//
+//            vertexArray[i * 3 + 0] = point.p.x;
+//            vertexArray[i * 3 + 1] = point.p.y;
+//            vertexArray[i * 3 + 2] = point.p.z;
+//        }
+//
+//        return vertexArray;
+//    }
+
+//    public int[] getIndexArray() {
+//        int[] indexArray = new int[pentagons.size() * 3 * 5];
+//
+//        for (int i = 0; i < pentagons.size(); i++) {
+//            AglShape shape = pentagons.get(i);
+//
+//            for (int j = 0; j < shape.getTriangles().size(); j++) {
+//                AglTriangle triangle = shape.getTriangles().get(j);
+//
+//                indexArray[i * 3 * 5 + j * 3 + 0] = points.indexOf(triangle.pointA);
+//                indexArray[i * 3 * 5 + j * 3 + 1] = points.indexOf(triangle.pointB);
+//                indexArray[i * 3 * 5 + j * 3 + 2] = points.indexOf(triangle.pointC);
+//            }
+//        }
+//
+//        return indexArray;
+//    }
 }

@@ -1,6 +1,7 @@
 package test;
 
 import android.opengl.GLES20;
+import android.util.Log;
 
 import com.hatfat.agl.AglCamera;
 import com.hatfat.agl.AglNode;
@@ -52,6 +53,8 @@ public class TestScene extends AglScene {
         AglMesh testMesh = null;
         float rotateSpeed = 4.0f;
 
+        long setupStartTime = System.currentTimeMillis();
+
         for (int i = 0; i < numTestNodes; i++) {
             if (testMesh == null) {
                 testMesh = AglMesh.makeIcosahedron();
@@ -62,7 +65,7 @@ public class TestScene extends AglScene {
 
             AglShapeMesh shapeMesh = AglShapeMesh.makeFromMesh(testMesh);
 
-            AglRenderable wireframeRenderable = TestRenderableFactory.createWireFrameFromTriangles(testMesh.getVertexArray(), testMesh.getNumVertices(), testMesh.getIndexArray(), testMesh.getNumTriangles());
+//            AglRenderable wireframeRenderable = TestRenderableFactory.createWireFrameFromTriangles(testMesh.getVertexArray(), testMesh.getNumVertices(), testMesh.getIndexArray(), testMesh.getNumTriangles());
             AglRenderable meshRenderable = TestRenderableFactory.createColoredRenderableFromMesh(testMesh);
             AglRenderable pentagonRenderable = shapeMesh.createWireframe();
 
@@ -78,6 +81,9 @@ public class TestScene extends AglScene {
             wireframeNodes[i] = wireframeNode;
             addNode(wireframeNode);
         }
+
+        long setupEndTime = System.currentTimeMillis();
+        Log.i("TestScene", "[" + numTestNodes + "] TestScene setup took " + (setupEndTime - setupStartTime) + " milliseconds.");
 
         meshNodes[activeNodeIndex].setShouldRender(true);
         wireframeNodes[activeNodeIndex].setShouldRender(true);

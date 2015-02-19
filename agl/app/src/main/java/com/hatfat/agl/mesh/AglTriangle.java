@@ -28,7 +28,30 @@ public class AglTriangle {
     }
 
     public boolean containsPoint(AglPoint point) {
-        return point.equals(pointA) || point.equals(pointB) || point.equals(pointC);
+//        return point.equals(pointA) || point.equals(pointB) || point.equals(pointC);
+
+        if (
+                pointA.p.x == point.p.x &&
+                pointA.p.y == point.p.y &&
+                pointA.p.z == point.p.z) {
+            return true;
+        }
+
+        if (
+                pointB.p.x == point.p.x &&
+                pointB.p.y == point.p.y &&
+                pointB.p.z == point.p.z) {
+            return true;
+        }
+
+        if (
+                pointC.p.x == point.p.x &&
+                pointC.p.y == point.p.y &&
+                pointC.p.z == point.p.z) {
+            return true;
+        }
+
+        return false;
     }
 
     public void removeNeighbor(AglTriangle neighbor) {
