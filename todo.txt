@@ -5,8 +5,6 @@ Agl TODO
 
 JOE's phone doesn't work right (Galaxy Nexus 4.2.2)
 
-simple obj file reader (just vertices and faces)
-
 -setup game android project with agl lib
 
 Figure out how we want to handle the GRID of hexes and 12 pentagons.

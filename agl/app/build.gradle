@@ -30,7 +30,7 @@ dependencies {
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: "file:////Users/scottrick/.m2/repository") //Taken from mvn -X
+            repository(url: "file:////Users/scottrick/.m2/repository")
             pom.groupId = 'com.hatfat.agl'
             pom.artifactId = 'agl-lib'
             pom.version = '0.1.0'
