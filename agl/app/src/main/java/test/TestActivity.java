@@ -22,7 +22,7 @@ public class TestActivity extends AglActivity implements View.OnTouchListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final TestScene aglScene = new TestScene();
+        final TestScene aglScene = new TestScene(getApplicationContext());
         aglSurfaceView.setScene(aglScene);
 
         aglSurfaceView.setOnTouchListener(this);

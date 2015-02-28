@@ -2,8 +2,6 @@ package test;
 
 import com.hatfat.agl.AglColoredGeometry;
 import com.hatfat.agl.AglWireframe;
-import com.hatfat.agl.mesh.AglMesh;
-import com.hatfat.agl.mesh.AglTriangle;
 
 public class TestRenderableFactory {
 
@@ -75,7 +73,6 @@ public class TestRenderableFactory {
     }
 
     public static AglWireframe createWireFrameFromTriangles(float[] vertices, int numVertices, int[] elements, int numTriangles) {
-
         int[] wireframeElements = new int[numTriangles * 6];
 
         for (int i = 0; i < numTriangles; i++) {
@@ -90,41 +87,6 @@ public class TestRenderableFactory {
         AglWireframe wireframe = new AglWireframe(vertices, numVertices, wireframeElements, wireframeElements.length);
 
         return wireframe;
-    }
-
-    public static AglColoredGeometry createColoredRenderableFromMesh(AglMesh mesh) {
-
-        float[] vertices = mesh.getVertexArray();
-        int numVertices = mesh.getNumVertices();
-
-        float[] newVertices = new float[numVertices * 10];
-
-        for (int i = 0; i < numVertices; i++) {
-            newVertices[i * 10 + 0] = vertices[i * 3 + 0]; //x
-            newVertices[i * 10 + 1] = vertices[i * 3 + 1]; //y
-            newVertices[i * 10 + 2] = vertices[i * 3 + 2]; //z
-            newVertices[i * 10 + 3] = 0.9f; //r
-            newVertices[i * 10 + 4] = 0.9f; //g
-            newVertices[i * 10 + 5] = 0.9f; //b
-            newVertices[i * 10 + 6] = 0.9f; //a
-            newVertices[i * 10 + 7] = vertices[i * 3 + 0]; //normal x
-            newVertices[i * 10 + 8] = vertices[i * 3 + 1]; //normal y
-            newVertices[i * 10 + 9] = vertices[i * 3 + 2]; //normal z
-        }
-
-        int numTriangles = mesh.getNumTriangles();
-        int[] elements = new int[numTriangles * 3];
-
-        for (int i = 0; i < numTriangles; i++) {
-            AglTriangle triangle = mesh.getTriangle(i);
-            elements[i * 3 + 0] = mesh.indexForPoint(triangle.pointA);
-            elements[i * 3 + 1] = mesh.indexForPoint(triangle.pointB);
-            elements[i * 3 + 2] = mesh.indexForPoint(triangle.pointC);
-        }
-
-        AglColoredGeometry coloredGeometry = new AglColoredGeometry(newVertices, numVertices, elements, elements.length);
-
-        return coloredGeometry;
     }
 
     public static AglColoredGeometry createCube() {
@@ -163,7 +125,6 @@ public class TestRenderableFactory {
     public static AglColoredGeometry createFlatCube() {
         float vertices[] = {
                 //vertex (x, y, z), color (r, g, b, a),    normal (x, y, z)
-
 
                 //FRONT
                -1f,  1f,  1f,        1f,  0f,  0f,  1f,      0f,  0f,  1f,   //1

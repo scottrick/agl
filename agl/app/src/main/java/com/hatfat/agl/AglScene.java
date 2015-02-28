@@ -1,5 +1,6 @@
 package com.hatfat.agl;
 
+import android.content.Context;
 import android.opengl.GLES20;
 import android.util.Log;
 
@@ -28,12 +29,16 @@ public class AglScene implements AglUpdateable {
 
     private boolean sceneNeedsSetup = true;
 
+    private Context context;
+
     //scratch
     protected int updateInt = 0;
 
-    public AglScene() {
+    public AglScene(Context context) {
+        this.context = context;
+
         nodes = new AglNode[maxNumNodes];
-        renderableHashMap = new HashMap<AglRenderable, List<AglNode>>();
+        renderableHashMap = new HashMap<>();
 
         camera = new AglPerspectiveCamera(
                 new Vec3(0.0f, 0.0f, 10.0f),
@@ -203,6 +208,10 @@ public class AglScene implements AglUpdateable {
 
     public AglPointLight getGlobalLight() {
         return globalLight;
+    }
+
+    protected Context getContext() {
+        return context;
     }
 
     public boolean doesSceneNeedSetup() {

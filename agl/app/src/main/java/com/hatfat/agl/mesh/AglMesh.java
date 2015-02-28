@@ -1,7 +1,11 @@
 package com.hatfat.agl.mesh;
 
+import com.hatfat.agl.AglColoredGeometry;
+import com.hatfat.agl.AglWireframe;
 import com.hatfat.agl.util.Vec3;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,12 +14,16 @@ import java.util.Set;
 import test.TestRenderableFactory;
 
 public class AglMesh {
-    protected List<AglPoint> points;
-    protected List<AglPoint> startingPoints;
-    protected List<AglTriangle> triangles;
+
+    private final ArrayList<AglPoint> points;
+    private final List<AglTriangle> triangles;
+
+    //maps points by index to a list of triangles they are in
+    private HashMap<Integer, Set<AglTriangle>> pointMap = null;
 
     public static AglMesh makeIcosahedron() {
-        AglMesh mesh = new AglMesh();
+        ArrayList<AglPoint> points = new ArrayList<>();
+        ArrayList<AglTriangle> triangles = new ArrayList<>();
 
         for (int i = 0; i < 12; i++) {
             Vec3 newPoint = new Vec3(
@@ -25,26 +33,36 @@ public class AglMesh {
 
             AglPoint p = new AglPoint(newPoint);
 
-            mesh.points.add(p);
-            mesh.startingPoints.add(p);
+            points.add(p);
         }
 
         for (int i = 0; i < 20; i++) {
             AglTriangle newTriangle = new AglTriangle(
-                    mesh.points.get(TestRenderableFactory.icosahedronElements[i * 3 + 0]),
-                    mesh.points.get(TestRenderableFactory.icosahedronElements[i * 3 + 1]),
-                    mesh.points.get(TestRenderableFactory.icosahedronElements[i * 3 + 2]));
+                    TestRenderableFactory.icosahedronElements[i * 3 + 0],
+                    TestRenderableFactory.icosahedronElements[i * 3 + 1],
+                    TestRenderableFactory.icosahedronElements[i * 3 + 2]);
 
-            mesh.addTriangle(newTriangle);
+            triangles.add(newTriangle);
         }
 
-        return mesh;
+        return new AglMesh(points, triangles);
     }
 
-    public AglMesh() {
-        points = new LinkedList();
-        startingPoints = new LinkedList();
-        triangles = new LinkedList();
+    public AglMesh(ArrayList<AglPoint> points, ArrayList<AglTriangle> triangles) {
+        this.points = points;
+        this.triangles = triangles;
+    }
+
+    public int getNumTriangles() {
+        return triangles.size();
+    }
+
+    public int getNumVertices() {
+        return points.size();
+    }
+
+    public HashMap<Integer, Set<AglTriangle>> getPointMap() {
+        return pointMap;
     }
 
     public float[] getVertexArray() {
@@ -61,37 +79,55 @@ public class AglMesh {
         return vertices;
     }
 
-    public int[] getIndexArray() {
-        int[] indices = new int[triangles.size() * 3];
+    public List<AglTriangle> getTriangles() {
+        return triangles;
+    }
 
-        for (int i = 0; i < triangles.size(); i++) {
-            AglTriangle triangle = triangles.get(i);
+    public ArrayList<AglPoint> getPoints() {
+        return points;
+    }
 
-            indices[i * 3 + 0] = points.indexOf(triangle.pointA);
-            indices[i * 3 + 1] = points.indexOf(triangle.pointB);
-            indices[i * 3 + 2] = points.indexOf(triangle.pointC);
+    private void addPointToPointMap(Integer point, AglTriangle triangle, HashMap<Integer, Set<AglTriangle>> pointMap) {
+        Set<AglTriangle> triangleSet = pointMap.get(point);
+
+        if (triangleSet == null) {
+            triangleSet = new HashSet<>();
+            pointMap.put(point, triangleSet);
         }
 
-        return indices;
+        triangleSet.add(triangle);
     }
 
-    public int getNumTriangles() {
-        return triangles.size();
-    }
+    private void generatePointMap() {
+        if (pointMap == null) {
+            pointMap = new HashMap<>();
 
-    public int getNumVertices() {
-        return points.size();
+            for (AglTriangle triangle : triangles) {
+                addPointToPointMap(triangle.pointA, triangle, pointMap);
+                addPointToPointMap(triangle.pointB, triangle, pointMap);
+                addPointToPointMap(triangle.pointC, triangle, pointMap);
+            }
+        }
     }
 
     public void setupTriangleNeighbors() {
-        Set<AglTriangle> trianglesToCheck = new HashSet<AglTriangle>();
+        generatePointMap();
+
+        List<AglTriangle> trianglesToCheck = new LinkedList<>();
 
         for (AglTriangle triangle : triangles) {
+            if (triangle.neighborAB != null
+                    && triangle.neighborBC != null
+                    && triangle.neighborCA != null) {
+                //this triangle was already taken care of when its neighbors were done
+                continue;
+            }
+
             trianglesToCheck.clear();
 
-            trianglesToCheck.addAll(triangle.pointA.triangles);
-            trianglesToCheck.addAll(triangle.pointB.triangles);
-            trianglesToCheck.addAll(triangle.pointC.triangles);
+            trianglesToCheck.addAll(pointMap.get(triangle.pointA));
+            trianglesToCheck.addAll(pointMap.get(triangle.pointB));
+            trianglesToCheck.addAll(pointMap.get(triangle.pointC));
 
             for (AglTriangle tri : trianglesToCheck) {
                 if (tri == triangle) {
@@ -102,6 +138,7 @@ public class AglMesh {
                     //still looking for the AB neighbor
                     if (tri.containsPoint(triangle.pointA) && tri.containsPoint(triangle.pointB)) {
                         triangle.neighborAB = tri;
+                        tri.setAppropriateNeighbor(triangle);
                         continue;
                     }
                 }
@@ -110,6 +147,7 @@ public class AglMesh {
                     //still looking for the BC neighbor
                     if (tri.containsPoint(triangle.pointB) && tri.containsPoint(triangle.pointC)) {
                         triangle.neighborBC = tri;
+                        tri.setAppropriateNeighbor(triangle);
                         continue;
                     }
                 }
@@ -118,6 +156,7 @@ public class AglMesh {
                     //still looking for the CA neighbor
                     if (tri.containsPoint(triangle.pointC) && tri.containsPoint(triangle.pointA)) {
                         triangle.neighborCA = tri;
+                        tri.setAppropriateNeighbor(triangle);
                         continue;
                     }
                 }
@@ -126,18 +165,29 @@ public class AglMesh {
     }
 
     public AglMesh splitMesh() {
-        AglMesh newMesh = new AglMesh();
-
         //first setup all the triangle neighbors
         setupTriangleNeighbors();
 
-        //add all of the points to the new mesh
+        //make our new points list from the previous points
+        ArrayList<AglPoint> newPoints = new ArrayList<>(points);
+
+        //and add in the center point for each triangle
         for (AglTriangle triangle : triangles) {
-            newMesh.addPoint(triangle.pointA);
-            newMesh.addPoint(triangle.pointB);
-            newMesh.addPoint(triangle.pointC);
-            newMesh.addPoint(triangle.pointCenter);
+            AglPoint pointA = points.get(triangle.pointA);
+            AglPoint pointB = points.get(triangle.pointB);
+            AglPoint pointC = points.get(triangle.pointC);
+
+            Vec3 center = new Vec3(
+                    (pointA.p.x + pointB.p.x + pointC.p.x) / 3.0f,
+                    (pointA.p.y + pointB.p.y + pointC.p.y) / 3.0f,
+                    (pointA.p.z + pointB.p.z + pointC.p.z) / 3.0f);
+            center.normalize();
+
+            triangle.pointCenter = newPoints.size();
+            newPoints.add(new AglPoint(center));
         }
+
+        ArrayList<AglTriangle> newTriangles = new ArrayList<>();
 
         //add the split triangles for each neighbor (that hasn't been split yet)
         for (AglTriangle triangle : triangles) {
@@ -145,8 +195,8 @@ public class AglMesh {
                 //add the two triangles for this neighbor
                 AglTriangle tri1 = new AglTriangle(triangle.pointCenter, triangle.pointA, triangle.neighborAB.pointCenter);
                 AglTriangle tri2 = new AglTriangle(triangle.pointCenter, triangle.neighborAB.pointCenter, triangle.pointB);
-                newMesh.triangles.add(tri1);
-                newMesh.triangles.add(tri2);
+                newTriangles.add(tri1);
+                newTriangles.add(tri2);
 
                 triangle.neighborAB.removeNeighbor(triangle);
                 triangle.neighborAB = null;
@@ -156,8 +206,8 @@ public class AglMesh {
                 //add the two triangles for this neighbor
                 AglTriangle tri1 = new AglTriangle(triangle.pointCenter, triangle.pointB, triangle.neighborBC.pointCenter);
                 AglTriangle tri2 = new AglTriangle(triangle.pointCenter, triangle.neighborBC.pointCenter, triangle.pointC);
-                newMesh.triangles.add(tri1);
-                newMesh.triangles.add(tri2);
+                newTriangles.add(tri1);
+                newTriangles.add(tri2);
 
                 triangle.neighborBC.removeNeighbor(triangle);
                 triangle.neighborBC = null;
@@ -167,64 +217,69 @@ public class AglMesh {
                 //add the two triangles for this neighbor
                 AglTriangle tri1 = new AglTriangle(triangle.pointCenter, triangle.pointC, triangle.neighborCA.pointCenter);
                 AglTriangle tri2 = new AglTriangle(triangle.pointCenter, triangle.neighborCA.pointCenter, triangle.pointA);
-                newMesh.triangles.add(tri1);
-                newMesh.triangles.add(tri2);
+                newTriangles.add(tri1);
+                newTriangles.add(tri2);
 
                 triangle.neighborCA.removeNeighbor(triangle);
                 triangle.neighborCA = null;
             }
         }
 
-        AglMesh finalMesh = new AglMesh();
+        return new AglMesh(newPoints, newTriangles);
+    }
 
-        //MAKE THE FINAL mesh with new point/triangle objects for everything
-        for (AglPoint point : newMesh.points) {
-            finalMesh.addPoint(new AglPoint(point));
+    public AglColoredGeometry toColoredGeometryRenderable() {
+        float[] vertices = getVertexArray();
+        int numVertices = getNumVertices();
+
+        float[] newVertices = new float[numVertices * 10];
+
+        for (int i = 0; i < numVertices; i++) {
+            newVertices[i * 10 + 0] = vertices[i * 3 + 0]; //x
+            newVertices[i * 10 + 1] = vertices[i * 3 + 1]; //y
+            newVertices[i * 10 + 2] = vertices[i * 3 + 2]; //z
+            newVertices[i * 10 + 3] = 0.9f; //r
+            newVertices[i * 10 + 4] = 0.9f; //g
+            newVertices[i * 10 + 5] = 0.9f; //b
+            newVertices[i * 10 + 6] = 0.9f; //a
+            newVertices[i * 10 + 7] = vertices[i * 3 + 0]; //normal x
+            newVertices[i * 10 + 8] = vertices[i * 3 + 1]; //normal y
+            newVertices[i * 10 + 9] = vertices[i * 3 + 2]; //normal z
         }
 
-        for (AglPoint point : startingPoints) {
-            finalMesh.startingPoints.add(finalMesh.pointAtIndex(finalMesh.indexForPoint(point)));
+        int[] elements = new int[triangles.size() * 3];
+
+        for (int i = 0; i < triangles.size(); i++) {
+            AglTriangle triangle = triangles.get(i);
+            elements[i * 3 + 0] = triangle.pointA;
+            elements[i * 3 + 1] = triangle.pointB;
+            elements[i * 3 + 2] = triangle.pointC;
         }
 
-        for (AglTriangle triangle : newMesh.triangles) {
-            int indexA = finalMesh.points.indexOf(triangle.pointA);
-            int indexB = finalMesh.points.indexOf(triangle.pointB);
-            int indexC = finalMesh.points.indexOf(triangle.pointC);
+        AglColoredGeometry coloredGeometry = new AglColoredGeometry(newVertices, numVertices, elements, elements.length);
 
-            AglPoint pointA = finalMesh.points.get(indexA);
-            AglPoint pointB = finalMesh.points.get(indexB);
-            AglPoint pointC = finalMesh.points.get(indexC);
+        return coloredGeometry;
+    }
 
-            finalMesh.addTriangle(new AglTriangle(pointA, pointB, pointC));
+    public AglWireframe toWireframeRenderable() {
+        float[] vertexArray = getVertexArray();
+        int numVertices = getNumVertices();
+
+        int[] indicesArray = new int[triangles.size() * 6];
+
+        for (int i = 0; i < triangles.size(); i++) {
+            AglTriangle triangle = triangles.get(i);
+
+            indicesArray[(i * 6) + 0] = triangle.pointA;
+            indicesArray[(i * 6) + 1] = triangle.pointB;
+            indicesArray[(i * 6) + 2] = triangle.pointB;
+            indicesArray[(i * 6) + 3] = triangle.pointC;
+            indicesArray[(i * 6) + 4] = triangle.pointC;
+            indicesArray[(i * 6) + 5] = triangle.pointA;
         }
 
-        return finalMesh;
-    }
+        AglWireframe wireframe = new AglWireframe(vertexArray, numVertices, indicesArray, indicesArray.length);
 
-    //adds a point if its not already in the list
-    private void addPoint(AglPoint point) {
-        if (!points.contains(point)) {
-            points.add(point);
-        }
-    }
-
-    private void addTriangle(AglTriangle triangle) {
-        triangles.add(triangle);
-
-        triangle.pointA.addTriangle(triangle);
-        triangle.pointB.addTriangle(triangle);
-        triangle.pointC.addTriangle(triangle);
-    }
-
-    public int indexForPoint(AglPoint point) {
-        return points.indexOf(point);
-    }
-
-    public AglPoint pointAtIndex(int index) {
-        return points.get(index);
-    }
-
-    public AglTriangle getTriangle(int index) {
-        return triangles.get(index);
+        return wireframe;
     }
 }

@@ -54,7 +54,7 @@ public class AglRenderer implements GLSurfaceView.Renderer {
         this.shaderManager = new AglShaderManager(context);
 
         //default scene
-        this.currentScene = new AglScene();
+        this.currentScene = new AglScene(context);
 
         AglApplication.get(context).inject(this);
     }

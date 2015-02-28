@@ -1,3 +1,6 @@
+# ignore bucky ball meshes since they are large and can be auto generated
+*.bb
+
 # built application files
 *.apk
 *.ap_

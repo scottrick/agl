@@ -47,7 +47,7 @@ public class AglWireframe implements AglRenderable {
         float[] lineWidth = new float[2];
         GLES20.glGetFloatv(GLES20.GL_ALIASED_LINE_WIDTH_RANGE, lineWidth, 0);
 
-        //user lineWidth 2.0f if supported
+        //use lineWidth 2.0f if supported
         this.lineWidth = Math.min(lineWidth[1], 2.0f);
     }
 

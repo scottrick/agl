@@ -1,5 +1,8 @@
 Agl TODO
 ---------------------------
+~7250 milliseconds generating on the fly (8 levels)
+~1350 milliseconds loading from disk
+
 JOE's phone doesn't work right (Galaxy Nexus 4.2.2)
 
 simple obj file reader (just vertices and faces)

@@ -2,26 +2,17 @@ package com.hatfat.agl.mesh;
 
 import com.hatfat.agl.util.Vec3;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 //a point object used when generating the hex meshes
 public class AglPoint implements Comparable<AglPoint> {
-    public Vec3 p;
-    public List<AglTriangle> triangles;
+
+    public final Vec3 p;
 
     public AglPoint(Vec3 p) {
         this.p = p;
-        this.triangles = new LinkedList();
-    }
-
-    public AglPoint(AglPoint fromPoint) {
-        this.p = new Vec3(fromPoint.p.x, fromPoint.p.y, fromPoint.p.z);
-        this.triangles = new LinkedList();
-    }
-
-    public void addTriangle(AglTriangle triangle) {
-        this.triangles.add(triangle);
     }
 
     @Override
@@ -44,7 +35,7 @@ public class AglPoint implements Comparable<AglPoint> {
 
     @Override
     public int hashCode() {
-        return (int)this.p.x * 3 + (int)this.p.y * 4 + (int)this.p.z * 5;
+        return Float.valueOf(p.x).hashCode() + Float.valueOf(p.y).hashCode() + Float.valueOf(p.z).hashCode();
     }
 
     @Override public int compareTo(AglPoint another) {
@@ -65,5 +56,19 @@ public class AglPoint implements Comparable<AglPoint> {
         }
 
         return 0;
+    }
+
+    public void writeToDataStream(DataOutputStream out) throws IOException {
+        out.writeFloat(p.x);
+        out.writeFloat(p.y);
+        out.writeFloat(p.z);
+    }
+
+    public static AglPoint readPointFromStream(DataInputStream in) throws IOException {
+        float x = in.readFloat();
+        float y = in.readFloat();
+        float z = in.readFloat();
+
+        return new AglPoint(new Vec3(x, y, z));
     }
 }
