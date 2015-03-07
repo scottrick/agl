@@ -8,6 +8,8 @@ improve camera handling
 
 Basic terrain generation?
 
+Joe & Mike's phones aren't drawing correctly
+
 -texture/bumpmap support
 
 -Need to figure out how I want to handle lighting.  Then create:
@@ -24,8 +26,6 @@ Basic terrain generation?
 -enable multisampling
 
 -might want to write a custom wrapper class to handle this array management / iterating
-
-JOE's phone doesn't work right (Galaxy Nexus 4.2.2)
 
 
 
