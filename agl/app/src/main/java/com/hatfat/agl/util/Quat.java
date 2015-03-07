@@ -90,7 +90,23 @@ public class Quat {
         this.w += q.w;
     }
 
-    public void multiply(final Quat q) {
+    public void rotateBy(final Quat q) {
+        if (scratchQuat == null) {
+            scratchQuat = new Quat();
+        }
+
+        scratchQuat.w = (q.w * w) - (q.x * x) - (q.y * y) - (q.z * z);
+        scratchQuat.x = (q.w * x) + (q.x * w) + (q.y * z) - (q.z * y);
+        scratchQuat.y = (q.w * y) - (q.x * z) + (q.y * w) + (q.z * x);
+        scratchQuat.z = (q.w * z) + (q.x * y) - (q.y * x) + (q.z * w);
+
+        this.w = scratchQuat.w;
+        this.x = scratchQuat.x;
+        this.y = scratchQuat.y;
+        this.z = scratchQuat.z;
+    }
+
+    private void multiply(final Quat q) {
         if (scratchQuat == null) {
             scratchQuat = new Quat();
         }

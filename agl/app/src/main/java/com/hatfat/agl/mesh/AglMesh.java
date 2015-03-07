@@ -2,6 +2,7 @@ package com.hatfat.agl.mesh;
 
 import com.hatfat.agl.AglColoredGeometry;
 import com.hatfat.agl.AglWireframe;
+import com.hatfat.agl.mesh.gen.AglGenTriangle;
 import com.hatfat.agl.util.Vec3;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import test.TestRenderableFactory;
 
 public class AglMesh {
 
-    private final ArrayList<AglPoint> points;
+    protected final ArrayList<AglPoint> points;
     private final List<AglTriangle> triangles;
 
     //maps points by index to a list of triangles they are in
@@ -37,7 +38,7 @@ public class AglMesh {
         }
 
         for (int i = 0; i < 20; i++) {
-            AglTriangle newTriangle = new AglTriangle(
+            AglTriangle newTriangle = new AglGenTriangle(
                     TestRenderableFactory.icosahedronElements[i * 3 + 0],
                     TestRenderableFactory.icosahedronElements[i * 3 + 1],
                     TestRenderableFactory.icosahedronElements[i * 3 + 2]);
@@ -114,8 +115,12 @@ public class AglMesh {
         generatePointMap();
 
         List<AglTriangle> trianglesToCheck = new LinkedList<>();
+        AglGenTriangle triangle;
+        AglGenTriangle tri;
 
-        for (AglTriangle triangle : triangles) {
+        for (AglTriangle aglTriangle : triangles) {
+            triangle = (AglGenTriangle) aglTriangle;
+
             if (triangle.neighborAB != null
                     && triangle.neighborBC != null
                     && triangle.neighborCA != null) {
@@ -129,10 +134,12 @@ public class AglMesh {
             trianglesToCheck.addAll(pointMap.get(triangle.pointB));
             trianglesToCheck.addAll(pointMap.get(triangle.pointC));
 
-            for (AglTriangle tri : trianglesToCheck) {
-                if (tri == triangle) {
+            for (AglTriangle aglTri : trianglesToCheck) {
+                if (aglTri == triangle) {
                     continue;
                 }
+
+                tri = (AglGenTriangle) aglTri;
 
                 if (triangle.neighborAB == null) {
                     //still looking for the AB neighbor
@@ -170,9 +177,12 @@ public class AglMesh {
 
         //make our new points list from the previous points
         ArrayList<AglPoint> newPoints = new ArrayList<>(points);
+        AglGenTriangle triangle;
 
         //and add in the center point for each triangle
-        for (AglTriangle triangle : triangles) {
+        for (AglTriangle tri : triangles) {
+            triangle = (AglGenTriangle) tri;
+
             AglPoint pointA = points.get(triangle.pointA);
             AglPoint pointB = points.get(triangle.pointB);
             AglPoint pointC = points.get(triangle.pointC);
@@ -190,11 +200,13 @@ public class AglMesh {
         ArrayList<AglTriangle> newTriangles = new ArrayList<>();
 
         //add the split triangles for each neighbor (that hasn't been split yet)
-        for (AglTriangle triangle : triangles) {
+        for (AglTriangle tri : triangles) {
+            triangle = (AglGenTriangle) tri;
+
             if (triangle.neighborAB != null) {
                 //add the two triangles for this neighbor
-                AglTriangle tri1 = new AglTriangle(triangle.pointCenter, triangle.pointA, triangle.neighborAB.pointCenter);
-                AglTriangle tri2 = new AglTriangle(triangle.pointCenter, triangle.neighborAB.pointCenter, triangle.pointB);
+                AglTriangle tri1 = new AglGenTriangle(triangle.pointCenter, triangle.pointA, triangle.neighborAB.pointCenter);
+                AglTriangle tri2 = new AglGenTriangle(triangle.pointCenter, triangle.neighborAB.pointCenter, triangle.pointB);
                 newTriangles.add(tri1);
                 newTriangles.add(tri2);
 
@@ -204,8 +216,8 @@ public class AglMesh {
 
             if (triangle.neighborBC != null) {
                 //add the two triangles for this neighbor
-                AglTriangle tri1 = new AglTriangle(triangle.pointCenter, triangle.pointB, triangle.neighborBC.pointCenter);
-                AglTriangle tri2 = new AglTriangle(triangle.pointCenter, triangle.neighborBC.pointCenter, triangle.pointC);
+                AglTriangle tri1 = new AglGenTriangle(triangle.pointCenter, triangle.pointB, triangle.neighborBC.pointCenter);
+                AglTriangle tri2 = new AglGenTriangle(triangle.pointCenter, triangle.neighborBC.pointCenter, triangle.pointC);
                 newTriangles.add(tri1);
                 newTriangles.add(tri2);
 
@@ -215,8 +227,8 @@ public class AglMesh {
 
             if (triangle.neighborCA != null) {
                 //add the two triangles for this neighbor
-                AglTriangle tri1 = new AglTriangle(triangle.pointCenter, triangle.pointC, triangle.neighborCA.pointCenter);
-                AglTriangle tri2 = new AglTriangle(triangle.pointCenter, triangle.neighborCA.pointCenter, triangle.pointA);
+                AglTriangle tri1 = new AglGenTriangle(triangle.pointCenter, triangle.pointC, triangle.neighborCA.pointCenter);
+                AglTriangle tri2 = new AglGenTriangle(triangle.pointCenter, triangle.neighborCA.pointCenter, triangle.pointA);
                 newTriangles.add(tri1);
                 newTriangles.add(tri2);
 

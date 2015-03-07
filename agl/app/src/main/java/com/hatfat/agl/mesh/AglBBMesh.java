@@ -2,6 +2,7 @@ package com.hatfat.agl.mesh;
 
 import com.hatfat.agl.AglColoredGeometry;
 import com.hatfat.agl.AglWireframe;
+import com.hatfat.agl.mesh.gen.AglGenTriangle;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -18,29 +19,19 @@ import java.util.List;
 import java.util.Set;
 
 //Agl Bucky Ball Mesh
-public class AglBBMesh {
+public class AglBBMesh extends AglMesh {
 
-    private final List<AglPoint> points;
-    private final HashMap<AglPoint, Integer> indexMap; //map to the points index
+    public final static int NUM_PENTAGONS = 12;
 
-    private List<AglShape> pentagons;
-    private List<AglShape> hexagons;
+    private List<AglShape> shapes;
 
-    public AglBBMesh(ArrayList<AglPoint> points, ArrayList<AglShape> pentagons,
-            ArrayList<AglShape> hexagons) {
-        this.points = Collections.unmodifiableList(points);
-        this.pentagons = Collections.unmodifiableList(pentagons);
-        this.hexagons = Collections.unmodifiableList(hexagons);
-        this.indexMap = new HashMap<>();
+    public AglBBMesh(
+            ArrayList<AglPoint> points,
+            ArrayList<AglShape> shapes,
+            ArrayList<AglTriangle> triangles) {
+        super(points, triangles);
 
-        init();
-    }
-
-    private void init() {
-        //build the indexMap
-        for (int i = 0; i < points.size(); i++) {
-            indexMap.put(points.get(i), i);
-        }
+        this.shapes = Collections.unmodifiableList(shapes);
     }
 
     private static ArrayList<Integer> createOuterPointsFromTriangles(Set<AglTriangle> triangleSet, int centerIndex) {
@@ -100,10 +91,14 @@ public class AglBBMesh {
     }
 
     public static AglBBMesh makeFromMesh(AglMesh mesh) {
-        ArrayList<AglShape> pentagons = new ArrayList<>();
-        ArrayList<AglShape> hexagons = new ArrayList<>();
+        ArrayList<AglShape> shapes = new ArrayList<>();
 
         mesh.setupTriangleNeighbors();
+
+        HashMap<AglShape, Integer> shapeIndexMap = new HashMap<>();
+
+        AglGenTriangle triangle;
+        AglGenTriangle genTri;
 
         //make the starting 12 pentagons
         for (int i = 0; i < 12; i++) {
@@ -111,32 +106,40 @@ public class AglBBMesh {
             ArrayList<Integer> outerPoints = createOuterPointsFromTriangles(triangleSet, i);
 
             AglShape pentagon = new AglShape(outerPoints, new ArrayList(triangleSet), i);
-            pentagons.add(pentagon);
+            shapeIndexMap.put(pentagon, shapes.size());
+            shapes.add(pentagon);
+
+            for (AglTriangle tri : triangleSet) {
+                triangle = (AglGenTriangle) tri;
+                triangle.shape = pentagon;
+            }
         }
 
         HashSet<AglTriangle> usedTriangles = new HashSet<>();
-        for (AglShape pentagon : pentagons) {
-            usedTriangles.addAll(pentagon.getTriangles());
+        for (AglShape shape : shapes) {
+            usedTriangles.addAll(shape.getTriangles());
         }
 
         List<AglShape> shapesToCheck = new LinkedList<>();
-        shapesToCheck.addAll(pentagons);
+        shapesToCheck.addAll(shapes);
 
         while (shapesToCheck.size() > 0) {
             AglShape shape = shapesToCheck.get(0);
 
             for (AglTriangle tri : shape.getTriangles()) {
+                triangle = (AglGenTriangle) tri;
+
                 //find the edge for this triangle in the shape
                 AglTriangle edgeNeighbor = null;
 
-                if (tri.pointA == shape.getCenterIndex()) {
-                    edgeNeighbor = tri.neighborBC;
+                if (triangle.pointA == shape.getCenterIndex()) {
+                    edgeNeighbor = triangle.neighborBC;
                 }
-                else if (tri.pointB == shape.getCenterIndex()) {
-                    edgeNeighbor = tri.neighborCA;
+                else if (triangle.pointB == shape.getCenterIndex()) {
+                    edgeNeighbor = triangle.neighborCA;
                 }
-                else if (tri.pointC == shape.getCenterIndex()) {
-                    edgeNeighbor = tri.neighborAB;
+                else if (triangle.pointC == shape.getCenterIndex()) {
+                    edgeNeighbor = triangle.neighborAB;
                 }
 
                 if (edgeNeighbor == null) {
@@ -147,13 +150,13 @@ public class AglBBMesh {
                     //haven't added this triangle shape yet!
                     int edgeCenter = -1;
 
-                    if (!tri.containsPoint(edgeNeighbor.pointA)) {
+                    if (!triangle.containsPoint(edgeNeighbor.pointA)) {
                         edgeCenter = edgeNeighbor.pointA;
                     }
-                    else if (!tri.containsPoint(edgeNeighbor.pointB)) {
+                    else if (!triangle.containsPoint(edgeNeighbor.pointB)) {
                         edgeCenter = edgeNeighbor.pointB;
                     }
-                    else if (!tri.containsPoint(edgeNeighbor.pointC)) {
+                    else if (!triangle.containsPoint(edgeNeighbor.pointC)) {
                         edgeCenter = edgeNeighbor.pointC;
                     }
 
@@ -165,38 +168,63 @@ public class AglBBMesh {
                     ArrayList<Integer> outerPoints = createOuterPointsFromTriangles(triangleSet, edgeCenter);
 
                     AglShape hexagon = new AglShape(outerPoints, new ArrayList(triangleSet), edgeCenter);
-                    hexagons.add(hexagon);
+                    shapeIndexMap.put(hexagon, shapes.size());
+                    shapes.add(hexagon);
 
                     usedTriangles.addAll(hexagon.getTriangles());
                     shapesToCheck.add(hexagon);
+
+                    for (AglTriangle setTri : triangleSet) {
+                        genTri = (AglGenTriangle) setTri;
+                        genTri.shape = hexagon;
+                    }
                 }
             }
 
             shapesToCheck.remove(0);
         }
 
-        AglBBMesh shapeMesh = new AglBBMesh(mesh.getPoints(), pentagons, hexagons);
+        ArrayList<AglTriangle> triangles = new ArrayList<>();
+        for (AglShape shape : shapes) {
+            triangles.addAll(shape.getTriangles());
+        }
+
+        //setup shape neighbors
+        ////////////////////////////////////////////////////////////////////////////////////
+        for (AglShape shape : shapes) {
+            int currentShapeIndex = shapeIndexMap.get(shape);
+
+            for (AglTriangle shapeTri : shape.getTriangles()) {
+                triangle = (AglGenTriangle) shapeTri;
+
+                int indexAB = shapeIndexMap.get(triangle.neighborAB.shape);
+                if (indexAB != currentShapeIndex) {
+                    shape.addNeighbor(indexAB);
+                }
+
+                int indexBC = shapeIndexMap.get(triangle.neighborBC.shape);
+                if (indexBC != currentShapeIndex) {
+                    shape.addNeighbor(indexBC);
+                }
+
+                int indexCA = shapeIndexMap.get(triangle.neighborCA.shape);
+                if (indexCA != currentShapeIndex) {
+                    shape.addNeighbor(indexCA);
+                }
+            }
+        }
+        ////////////////////////////////////////////////////////////////////////////////////
+
+        AglBBMesh shapeMesh = new AglBBMesh(mesh.getPoints(), shapes, triangles);
         return shapeMesh;
     }
 
-    public List<AglShape> getPentagons() {
-        return pentagons;
+    public List<AglShape> getShapes() {
+        return shapes;
     }
 
-    public int getNumPentagons() {
-        return pentagons.size();
-    }
-
-    public List<AglShape> getHexagons() {
-        return hexagons;
-    }
-
-    public int getNumHexagons() {
-        return hexagons.size();
-    }
-
-    public int getNumTriangles() {
-        return pentagons.size() * 5 + hexagons.size() * 6;
+    public int getNumShapes() {
+        return shapes.size();
     }
 
     public int getNumPoints() {
@@ -230,39 +258,26 @@ public class AglBBMesh {
             newVertices[i * 10 + 3] = 0.9f; //r
             newVertices[i * 10 + 4] = 0.9f; //g
             newVertices[i * 10 + 5] = 0.9f; //b
-            newVertices[i * 10 + 6] = 0.9f; //a
+            newVertices[i * 10 + 6] = 1.0f; //a
             newVertices[i * 10 + 7] = vertices[i * 3 + 0]; //normal x
             newVertices[i * 10 + 8] = vertices[i * 3 + 1]; //normal y
             newVertices[i * 10 + 9] = vertices[i * 3 + 2]; //normal z
         }
 
-        int[] elements = new int[pentagons.size() * 15 + hexagons.size() * 18];
-        int hexagonOffset = pentagons.size() * 15;
+        int[] elements = new int[NUM_PENTAGONS * 15 + (getNumShapes() - NUM_PENTAGONS) * 18];
+        int currentOffset = 0;
 
-        for (int i = 0; i < pentagons.size(); i++) {
-            AglShape shape = pentagons.get(i);
-
+        for (AglShape shape : shapes) {
             for (int j = 0; j < shape.getOuterPoints().size(); j++) {
                 int index1 = shape.getOuterPoint(j);
                 int index2 = shape.getOuterPoint((j + 1) % shape.getOuterPoints().size());
 
-                elements[i * 15 + j * 3 + 0] = index2;
-                elements[i * 15 + j * 3 + 1] = shape.getCenterIndex();
-                elements[i * 15 + j * 3 + 2] = index1;
+                elements[currentOffset + j * 3 + 0] = index2;
+                elements[currentOffset + j * 3 + 1] = shape.getCenterIndex();
+                elements[currentOffset + j * 3 + 2] = index1;
             }
-        }
 
-        for (int i = 0; i < hexagons.size(); i++) {
-            AglShape shape = hexagons.get(i);
-
-            for (int j = 0; j < shape.getOuterPoints().size(); j++) {
-                int index1 = shape.getOuterPoint(j);
-                int index2 = shape.getOuterPoint((j + 1) % shape.getOuterPoints().size());
-
-                elements[i * 18 + j * 3 + 0 + hexagonOffset] = index2;
-                elements[i * 18 + j * 3 + 1 + hexagonOffset] = shape.getCenterIndex();
-                elements[i * 18 + j * 3 + 2 + hexagonOffset] = index1;
-            }
+            currentOffset += shape.getOuterPoints().size() * 3;
         }
 
         AglColoredGeometry coloredGeometry = new AglColoredGeometry(newVertices, numVertices, elements, elements.length);
@@ -276,40 +291,20 @@ public class AglBBMesh {
 
         int numPerPentagon = 10;
         int numPerHexagon = 12;
-        int[] indicesArray = new int[pentagons.size() * numPerPentagon + hexagons.size() * numPerHexagon];
+        int[] indicesArray = new int[NUM_PENTAGONS * numPerPentagon + (getNumShapes() - NUM_PENTAGONS) * numPerHexagon];
 
-        for (int i = 0; i < pentagons.size(); i++) {
-            AglShape pentagon = pentagons.get(i);
+        int currentOffset = 0;
+        int numOuterPoints = 0;
 
-            indicesArray[(i * numPerPentagon) + 0] = pentagon.getOuterPoint(0);
-            indicesArray[(i * numPerPentagon) + 1] = pentagon.getOuterPoint(1);
-            indicesArray[(i * numPerPentagon) + 2] = pentagon.getOuterPoint(1);
-            indicesArray[(i * numPerPentagon) + 3] = pentagon.getOuterPoint(2);
-            indicesArray[(i * numPerPentagon) + 4] = pentagon.getOuterPoint(2);
-            indicesArray[(i * numPerPentagon) + 5] = pentagon.getOuterPoint(3);
-            indicesArray[(i * numPerPentagon) + 6] = pentagon.getOuterPoint(3);
-            indicesArray[(i * numPerPentagon) + 7] = pentagon.getOuterPoint(4);
-            indicesArray[(i * numPerPentagon) + 8] = pentagon.getOuterPoint(4);
-            indicesArray[(i * numPerPentagon) + 9] = pentagon.getOuterPoint(0);
-        }
+        for (AglShape shape : shapes) {
+            numOuterPoints = shape.getOuterPoints().size();
 
-        int pentagonOffset = pentagons.size() * numPerPentagon;
+            for (int i = 0; i < numOuterPoints; i++) {
+                indicesArray[currentOffset + i * 2 + 0] = shape.getOuterPoint((i + 0) % numOuterPoints);
+                indicesArray[currentOffset + i * 2 + 1] = shape.getOuterPoint((i + 1) % numOuterPoints);
+            }
 
-        for (int i = 0; i < hexagons.size(); i++) {
-            AglShape hexagon = hexagons.get(i);
-
-            indicesArray[(i * numPerHexagon) + 0 + pentagonOffset] = hexagon.getOuterPoint(0);
-            indicesArray[(i * numPerHexagon) + 1 + pentagonOffset] = hexagon.getOuterPoint(1);
-            indicesArray[(i * numPerHexagon) + 2 + pentagonOffset] = hexagon.getOuterPoint(1);
-            indicesArray[(i * numPerHexagon) + 3 + pentagonOffset] = hexagon.getOuterPoint(2);
-            indicesArray[(i * numPerHexagon) + 4 + pentagonOffset] = hexagon.getOuterPoint(2);
-            indicesArray[(i * numPerHexagon) + 5 + pentagonOffset] = hexagon.getOuterPoint(3);
-            indicesArray[(i * numPerHexagon) + 6 + pentagonOffset] = hexagon.getOuterPoint(3);
-            indicesArray[(i * numPerHexagon) + 7 + pentagonOffset] = hexagon.getOuterPoint(4);
-            indicesArray[(i * numPerHexagon) + 8 + pentagonOffset] = hexagon.getOuterPoint(4);
-            indicesArray[(i * numPerHexagon) + 9 + pentagonOffset] = hexagon.getOuterPoint(5);
-            indicesArray[(i * numPerHexagon) + 10 + pentagonOffset] = hexagon.getOuterPoint(5);
-            indicesArray[(i * numPerHexagon) + 11 + pentagonOffset] = hexagon.getOuterPoint(0);
+            currentOffset += numOuterPoints * 2;
         }
 
         AglWireframe wireframe = new AglWireframe(vertexArray, numVertices, indicesArray, indicesArray.length);
@@ -319,6 +314,53 @@ public class AglBBMesh {
 
     public int getNumVertices() {
         return points.size();
+    }
+
+    //creates a new AglBBMesh, where no vertices are shared between shapes.
+    public AglBBMesh createNewMeshWithNoVertexSharing() {
+
+        ArrayList<AglPoint> newPoints = new ArrayList<>();
+        ArrayList<AglShape> newShapes = new ArrayList<>();
+
+        for (AglShape shape : shapes) {
+            int currentPointIndexStart = newPoints.size();
+
+            //add the outer points
+            for (Integer pointIndex : shape.getOuterPoints()) {
+                AglPoint point = points.get(pointIndex);
+                AglPoint newPoint = new AglPoint(point);
+                newPoints.add(newPoint);
+            }
+
+            //add the center point
+            AglPoint centerPoint = points.get(shape.getCenterIndex());
+            AglPoint newCenterPoint = new AglPoint(centerPoint);
+            newPoints.add(newCenterPoint);
+
+            ArrayList<Integer> newOuterPoints = new ArrayList<>();
+            ArrayList<AglTriangle> newTriangles = new ArrayList<>();
+            int newCenterIndex = currentPointIndexStart + shape.getOuterPoints().size();
+
+            for (int i = 0; i < shape.getOuterPoints().size(); i++) {
+                newOuterPoints.add(currentPointIndexStart + i);
+            }
+
+            for (int i = 0; i < newOuterPoints.size(); i++) {
+                int pointB = newOuterPoints.get(i);
+                int pointC = newOuterPoints.get((i + 1) % newOuterPoints.size());
+
+                newTriangles.add(new AglTriangle(newCenterIndex, pointB, pointC));
+            }
+
+            newShapes.add(new AglShape(newOuterPoints, newTriangles, newCenterIndex, shape.getNeighborIndices()));
+        }
+
+        ArrayList<AglTriangle> newTriangles = new ArrayList<>();
+        for (AglShape shape : shapes) {
+            newTriangles.addAll(shape.getTriangles());
+        }
+
+        return new AglBBMesh(newPoints, newShapes, newTriangles);
     }
 
     public void writeToDiskAsBytes(String filename) throws IOException {
@@ -335,10 +377,6 @@ public class AglBBMesh {
             for (AglPoint point : points) {
                 point.writeToDataStream(out);
             }
-
-            List<AglShape> shapes = new LinkedList<>();
-            shapes.addAll(pentagons);
-            shapes.addAll(hexagons);
 
             out.writeByte(AglDisk.SHAPES);
             out.writeInt(shapes.size());
@@ -361,8 +399,7 @@ public class AglBBMesh {
         DataInputStream in = null;
 
         ArrayList<AglPoint> points = new ArrayList<>();
-        ArrayList<AglShape> pentagons = new ArrayList<>();
-        ArrayList<AglShape> hexagons = new ArrayList<>();
+        ArrayList<AglShape> shapes = new ArrayList<>();
 
         try {
             in = new DataInputStream(inputStream);
@@ -384,16 +421,7 @@ public class AglBBMesh {
                         int numShapes = in.readInt();
                         for (int i = 0; i < numShapes; i++) {
                             AglShape newShape = AglShape.readShapeFromStream(in);
-
-                            if (newShape.getNumberOfSides() == 5) {
-                                pentagons.add(newShape);
-                            }
-                            else if (newShape.getNumberOfSides() == 6) {
-                                hexagons.add(newShape);
-                            }
-                            else {
-                                throw new RuntimeException("Invalid shape (" + newShape.getNumberOfSides() + " sides)");
-                            }
+                            shapes.add(newShape);
                         }
                     }
                         break;
@@ -414,7 +442,12 @@ public class AglBBMesh {
             }
         }
 
-        return new AglBBMesh(points, pentagons, hexagons);
+        ArrayList<AglTriangle> triangles = new ArrayList<>();
+        for (AglShape shape : shapes) {
+            triangles.addAll(shape.getTriangles());
+        }
+
+        return new AglBBMesh(points, shapes, triangles);
     }
 
     private static class Segment {

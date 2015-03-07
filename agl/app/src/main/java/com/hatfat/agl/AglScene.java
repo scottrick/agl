@@ -59,6 +59,12 @@ public class AglScene implements AglUpdateable {
         sceneNeedsSetup = true;
     }
 
+    public void addNodes(List<AglNode> nodes) {
+        for (AglNode node : nodes) {
+            addNode(node);
+        }
+    }
+
     public void addNode(AglNode node) {
         if (numNodes + 1 >= maxNumNodes) {
             throw new RuntimeException("Can't add more nodes!");

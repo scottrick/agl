@@ -12,7 +12,7 @@ uniform vec4 lightColor;
 void main()
 {
     //ambient
-    float ambient = 0.1;
+    float ambient = 0.3;
 
     //diffuse
     float diffuse = dot(fragNormal, lightDir);

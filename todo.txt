@@ -1,21 +1,14 @@
 Agl TODO
 ---------------------------
-~7250 milliseconds generating on the fly (8 levels)
-~1350 milliseconds loading from disk
 
-JOE's phone doesn't work right (Galaxy Nexus 4.2.2)
-
--setup game android project with agl lib
-
-Figure out how we want to handle the GRID of hexes and 12 pentagons.
- -> need a way to calculate tile coordinates (looks like some sort of polar coordinates will work?)
- -> Once we have the grid system, we need a new camera which always faces the origin, but can rotate around the sphere (at a specific hex, etc) at different zoom levels.  This camera should let you swipe the map around, like spinning a globe kinda.
-
-Examine the boundaries between AGL and QUEST's repos.
+improve camera handling
+ -scale rotation based on zoom and mesh size???
+ -FLING support?
+ -support animated camera movement, to zoom in on a specific point?
 
 Basic terrain generation?
 
--texture support
+-texture/bumpmap support
 
 -Need to figure out how I want to handle lighting.  Then create:
 	-texture shader w/ lighting
@@ -31,6 +24,8 @@ Basic terrain generation?
 -enable multisampling
 
 -might want to write a custom wrapper class to handle this array management / iterating
+
+JOE's phone doesn't work right (Galaxy Nexus 4.2.2)
 
 
 

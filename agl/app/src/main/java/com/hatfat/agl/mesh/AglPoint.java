@@ -15,6 +15,10 @@ public class AglPoint implements Comparable<AglPoint> {
         this.p = p;
     }
 
+    public AglPoint(AglPoint point) {
+        this.p = new Vec3(point.p);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof AglPoint)) {

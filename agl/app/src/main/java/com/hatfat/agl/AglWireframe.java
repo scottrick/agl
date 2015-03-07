@@ -73,6 +73,10 @@ public class AglWireframe implements AglRenderable {
         GLES20.glLineWidth(1.0f);
     }
 
+    public void setLineWidth(float lineWidth) {
+        this.lineWidth = lineWidth;
+    }
+
     @Override
     public String getShaderProgramName() {
         return "shaders/wireframe";

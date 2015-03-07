@@ -43,4 +43,16 @@ public class AglPerspectiveCamera implements AglCamera {
         Matrix.perspectiveM(projMatrix, 0, fov, aspectRatio, nearPlane, farPlane);
         return projMatrix;
     }
+
+    protected Vec3 getEye() {
+        return eye;
+    }
+
+    protected Vec3 getCenter() {
+        return center;
+    }
+
+    protected Vec3 getUp() {
+        return up;
+    }
 }

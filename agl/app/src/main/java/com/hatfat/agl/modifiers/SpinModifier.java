@@ -28,6 +28,6 @@ public class SpinModifier extends Modifier {
             scratch.setWithRotationInDegrees(degreesPerSecond * deltaTime, axis);
         }
 
-        node.posQuat.quat.multiply(scratch);
+        node.posQuat.quat.rotateBy(scratch);
     }
 }
