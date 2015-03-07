@@ -1,6 +1,8 @@
 Agl TODO
 ---------------------------
 
+camera rotation is faster after a camera focus happens!?!?
+
 detect touching a specific hex tile
 
 improve camera handling

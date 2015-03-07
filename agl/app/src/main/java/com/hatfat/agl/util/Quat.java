@@ -1,6 +1,7 @@
 package com.hatfat.agl.util;
 
 public class Quat {
+
     public float x;
     public float y;
     public float z;
@@ -38,10 +39,10 @@ public class Quat {
     public void setWithRotationInRadians(final float angle, final Vec3 axis) {
         axis.normalize();
 
-        w = (float)Math.cos(angle / 2.0f);
-        x = axis.x * (float)Math.sin(angle / 2.0f);
-        y = axis.y * (float)Math.sin(angle / 2.0f);
-        z = axis.z * (float)Math.sin(angle / 2.0f);
+        w = (float) Math.cos(angle / 2.0f);
+        x = axis.x * (float) Math.sin(angle / 2.0f);
+        y = axis.y * (float) Math.sin(angle / 2.0f);
+        z = axis.z * (float) Math.sin(angle / 2.0f);
 
         normalize();
     }
@@ -61,7 +62,7 @@ public class Quat {
             return false;
         }
 
-        scratch	= Util.invSqrt(scratch);
+        scratch = Util.invSqrt(scratch);
 
         w = w * scratch;
         x = x * scratch;
@@ -111,6 +112,8 @@ public class Quat {
         this.x = scratchQuat.x;
         this.y = scratchQuat.y;
         this.z = scratchQuat.z;
+
+        this.normalize();
     }
 
     private void multiply(final Quat q) {
@@ -127,5 +130,11 @@ public class Quat {
         this.x = scratchQuat.x;
         this.y = scratchQuat.y;
         this.z = scratchQuat.z;
+
+        normalize();
+    }
+
+    @Override public String toString() {
+        return "Quat (" + w + ", " + x + ", " + y + ", " + z + ")";
     }
 }
