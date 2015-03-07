@@ -24,6 +24,13 @@ public class Quat {
         this.w = w;
     }
 
+    public Quat(final Quat other) {
+        this.x = other.x;
+        this.y = other.y;
+        this.z = other.z;
+        this.w = other.w;
+    }
+
     public void setWithRotationInDegrees(final float angle, final Vec3 axis) {
         setWithRotationInRadians((angle / 180.0f * (float) Math.PI), axis);
     }

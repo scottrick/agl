@@ -105,7 +105,7 @@ public class AglScene implements AglUpdateable {
         List<AglNode> renderableNodeList = renderableHashMap.get(node.getRenderable());
 
         if (renderableNodeList == null) {
-            renderableNodeList = new LinkedList<AglNode>();
+            renderableNodeList = new LinkedList<>();
             renderableHashMap.put(node.getRenderable(), renderableNodeList);
         }
 

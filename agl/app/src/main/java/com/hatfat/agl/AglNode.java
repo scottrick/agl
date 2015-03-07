@@ -8,7 +8,9 @@ import com.hatfat.agl.util.Vec3;
 
 public class AglNode implements AglUpdateable {
     public PosQuat posQuat;
-    public Vec3 scale;
+
+    private Vec3 scale;
+    private Matrix scaleMatrix;
 
     protected AglRenderable renderable;
 
@@ -22,8 +24,6 @@ public class AglNode implements AglUpdateable {
     public AglNode(Vec3 position, AglRenderable renderable) {
         this.shouldRender = true;
         this.posQuat = new PosQuat(position, new Quat());
-        this.scale = new Vec3(1.0f, 1.0f, 1.0f);
-
         this.renderable = renderable;
         this.modifiers = new Modifier[maxNumModifiers];
     }
@@ -32,14 +32,36 @@ public class AglNode implements AglUpdateable {
         return shouldRender;
     }
 
+    public void setScale(Vec3 newScale) {
+        this.scale = newScale;
+
+        if (this.scale != null) {
+            this.scaleMatrix = new Matrix();
+            scaleMatrix.setScale(this.scale);
+        }
+        else {
+            scaleMatrix = null;
+        }
+    }
+
     public void setShouldRender(boolean newValue) {
         this.shouldRender = newValue;
     }
 
     //will set the model matrix to the passed in matrix
     public void getModelMatrix(Matrix matrix) {
-        posQuat.quat.toMatrix(matrix);
-        matrix.translate(posQuat.pos);
+        if (scaleMatrix != null) {
+            //need to apply scaling, do some extra work
+            posQuat.quat.toMatrix(matrix);
+            Matrix newMatrix = Matrix.multiplyBy(matrix, scaleMatrix);
+            newMatrix.translate(posQuat.pos);
+            matrix.set(newMatrix);
+        }
+        else {
+            //just rotation and translation
+            posQuat.quat.toMatrix(matrix);
+            matrix.translate(posQuat.pos);
+        }
     }
 
     public AglRenderable getRenderable() {

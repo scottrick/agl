@@ -5,8 +5,8 @@ public class PosQuat {
     public Quat quat;
 
     public PosQuat(final Vec3 pos, final Quat quat) {
-        this.pos = pos;
-        this.quat = quat;
+        this.pos = new Vec3(pos);
+        this.quat = new Quat(quat);
     }
 
     public String toString() {

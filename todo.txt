@@ -1,6 +1,8 @@
 Agl TODO
 ---------------------------
 
+detect touching a specific hex tile
+
 improve camera handling
  -scale rotation based on zoom and mesh size???
  -FLING support?
