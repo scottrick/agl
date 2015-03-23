@@ -70,6 +70,10 @@ public class AglOrthographicCamera implements AglCamera {
         return width;
     }
 
+    protected float getHeight() {
+        return top - bottom;
+    }
+
     protected Vec3 getEye() {
         return eye;
     }
@@ -80,5 +84,29 @@ public class AglOrthographicCamera implements AglCamera {
 
     protected Vec3 getUp() {
         return up;
+    }
+
+    protected float getLeft() {
+        return left;
+    }
+
+    protected float getRight() {
+        return right;
+    }
+
+    protected float getTop() {
+        return top;
+    }
+
+    protected float getBottom() {
+        return bottom;
+    }
+
+    protected float getNear() {
+        return near;
+    }
+
+    protected float getFar() {
+        return far;
     }
 }

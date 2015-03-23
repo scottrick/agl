@@ -89,6 +89,18 @@ public class Vec3 {
                 a.z * b.z;
     }
 
+    public static float calculateDistanceSquared(Vec3 a, Vec3 b) {
+        float x = a.x - b.x;
+        float y = a.y - b.y;
+        float z = a.z - b.z;
+
+        x = x * x;
+        y = y * y;
+        z = z * z;
+
+        return x + y + z;
+    }
+
     public static float calculateAngleRadians(Vec3 a, Vec3 b) {
         float dot = dotProduct(a, b);
         dot = dot / (a.getMagnitude() * b.getMagnitude());

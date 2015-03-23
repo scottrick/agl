@@ -130,6 +130,10 @@ public class Quat {
         normalize();
     }
 
+    public Quat getInverse() {
+        return new Quat(x, y, z, -w);
+    }
+
     @Override public String toString() {
         return String.format("Quat (%.2f, %.2f, %.2f, %.2f)", w, x, y, z);
     }
