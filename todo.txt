@@ -1,9 +1,10 @@
 Agl TODO
 ---------------------------
 
-camera rotation is faster after a camera focus happens!?!?
+scene changing loading screen?
 
-detect touching a specific hex tile
+textures on tiles!
+ -with bump mapping
 
 improve camera handling
  -scale rotation based on zoom and mesh size???
