@@ -48,11 +48,7 @@ public class Quat {
     }
 
     public void normalize() {
-        boolean normalizeResult = normalizeWork();
-
-        while (normalizeResult) {
-            normalizeResult = normalizeWork();
-        }
+        normalizeWork();
     }
 
     private boolean normalizeWork() {
@@ -135,6 +131,6 @@ public class Quat {
     }
 
     @Override public String toString() {
-        return "Quat (" + w + ", " + x + ", " + y + ", " + z + ")";
+        return String.format("Quat (%.2f, %.2f, %.2f, %.2f)", w, x, y, z);
     }
 }
