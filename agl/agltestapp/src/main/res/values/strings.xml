@@ -1,0 +1,8 @@
+<resources>
+
+    <string name="app_name">Agl Test App</string>
+
+    <string name="test_activity_random_color_button_text">Random Light Color</string>
+    <string name="test_activity_next_mesh_button_text">Next Mesh</string>
+
+</resources>

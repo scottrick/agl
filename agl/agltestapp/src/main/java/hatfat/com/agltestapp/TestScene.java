@@ -1,4 +1,4 @@
-package test;
+package hatfat.com.agltestapp;
 
 import android.content.Context;
 import android.opengl.GLES20;
@@ -26,7 +26,7 @@ public class TestScene extends AglScene {
     private AglNode[] wireframeNodes;
     private AglNode[] meshNodes;
 
-    int numTestNodes = 8;
+    int numTestNodes = 7;
 
     public TestScene(Context context) {
         super(context);
@@ -34,7 +34,7 @@ public class TestScene extends AglScene {
         rand = new Random();
 
         AglCamera camera = new AglPerspectiveCamera(
-                new Vec3(0.0f, 0.0f, 2.35f),
+                new Vec3(0.0f, 0.0f, 3.5f),
                 new Vec3(0.0f, 0.0f, 0.0f),
                 new Vec3(0.0f, 1.0f, 0.0f),
                 60.0f, 1.0f, 0.1f, 100.0f);
@@ -51,7 +51,7 @@ public class TestScene extends AglScene {
         meshNodes = new AglNode[numTestNodes];
 
         for (int i = 0; i < numTestNodes; i++) {
-            String resourceName = "mesh" + i;
+            String resourceName = "mesh" + (i + 1);
             int resId = getContext().getResources().getIdentifier(resourceName, "raw", getContext().getPackageName());
             InputStream in = getContext().getResources().openRawResource(resId);
 
@@ -99,6 +99,7 @@ public class TestScene extends AglScene {
 
         meshNodes[activeNodeIndex].setShouldRender(true);
         wireframeNodes[activeNodeIndex].setShouldRender(true);
+        bbMeshes = null; //don't need these anymore!
     }
 
     @Override

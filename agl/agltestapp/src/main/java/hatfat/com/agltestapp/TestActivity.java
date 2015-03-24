@@ -1,4 +1,4 @@
-package test;
+package hatfat.com.agltestapp;
 
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
-import com.hatfat.agl.R;
 import com.hatfat.agl.app.AglActivity;
 import com.hatfat.agl.util.AglRandom;
 import com.hatfat.agl.util.Vec3;

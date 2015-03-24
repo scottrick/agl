@@ -1,4 +1,4 @@
-package test;
+package com.hatfat.agl.mesh;
 
 import com.hatfat.agl.AglColoredGeometry;
 import com.hatfat.agl.AglWireframe;

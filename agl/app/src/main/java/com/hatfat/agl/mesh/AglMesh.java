@@ -12,8 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import test.TestRenderableFactory;
-
 public class AglMesh {
 
     protected final ArrayList<AglPoint> points;

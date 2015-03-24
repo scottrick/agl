@@ -1,4 +1,4 @@
-package test;
+package hatfat.com.agltestapp;
 
 import com.hatfat.agl.app.AglModule;
 
