@@ -1,7 +1,8 @@
 Agl TODO
 ---------------------------
 
-scene changing loading screen?
+Update quest to use new scene loading system
+Add a super lightweight loading scene, which is displayed while new scenes are being setup
 
 textures on tiles!
  -with bump mapping
