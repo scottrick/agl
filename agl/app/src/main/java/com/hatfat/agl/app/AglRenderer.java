@@ -142,13 +142,22 @@ public class AglRenderer implements GLSurfaceView.Renderer {
             }
 
             currentScene = nextScene;
+            nextScene = null;
         }
 
-        nextScene = null;
-
         //if the current scene needs to be setup, lets do it
-        if (currentScene != null && currentScene.doesSceneNeedSetup()) {
-            currentScene.setupScene();
+        if (currentScene != null) {
+            switch (currentScene.getSceneState()) {
+                case NOT_SETUP:
+                    currentScene.setupSceneBackground();
+                    break;
+                case READY_FOR_GL_SETUP:
+                    currentScene.setupSceneGL();
+                    break;
+                default:
+                    //nothing to setup!
+                    break;
+            }
         }
 
         updateCameraAspectRatio();

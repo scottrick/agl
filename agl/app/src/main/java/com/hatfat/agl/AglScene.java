@@ -2,6 +2,7 @@ package com.hatfat.agl;
 
 import android.content.Context;
 import android.opengl.GLES20;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.hatfat.agl.app.AglRenderer;
@@ -18,6 +19,14 @@ import java.util.List;
  */
 public class AglScene implements AglUpdateable {
 
+    public enum SceneState {
+        NOT_SETUP,
+        SETTING_UP_BACKGROUND,
+        READY_FOR_GL_SETUP,
+        SETTING_UP_GL_THREAD,
+        READY_FOR_RENDER,
+    }
+
     protected AglCamera camera;
     protected HashMap<AglRenderable, List<AglNode>> renderableHashMap;
 
@@ -27,7 +36,7 @@ public class AglScene implements AglUpdateable {
 
     protected AglPointLight globalLight;
 
-    private boolean sceneNeedsSetup = true;
+    private SceneState sceneState = SceneState.NOT_SETUP;
 
     private Context context;
 
@@ -49,14 +58,52 @@ public class AglScene implements AglUpdateable {
         globalLight = new AglPointLight(new Vec3(0.0f, 0.0f, 1.0f), new Color(1.0f, 1.0f, 1.0f, 1.0f));
     }
 
-    public void setupScene() {
-        //setup scene renderables in subclass here
-        sceneNeedsSetup = false;
+    public final void setupSceneBackground() {
+        sceneState = SceneState.SETTING_UP_BACKGROUND;
+        final long setupStartTime = System.currentTimeMillis();
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override protected Void doInBackground(Void... params) {
+                setupSceneBackgroundWork();
+                return null;
+            }
+
+            @Override protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+
+                long setupEndTime = System.currentTimeMillis();
+                Log.i("AglScene", AglScene.this.getClass().getSimpleName() + " background setup took " + (setupEndTime - setupStartTime) + " milliseconds.");
+
+                sceneState = SceneState.READY_FOR_GL_SETUP;
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    protected void setupSceneBackgroundWork() {
+        //override in subclass
+    }
+
+    public final void setupSceneGL() {
+        sceneState = SceneState.SETTING_UP_GL_THREAD;
+        final long setupStartTime = System.currentTimeMillis();
+
+        setupSceneGLWork();
+
+        long setupEndTime = System.currentTimeMillis();
+        Log.i("AglScene", AglScene.this.getClass().getSimpleName() + " GL setup took " + (setupEndTime - setupStartTime) + " milliseconds.");
+
+        sceneState = SceneState.READY_FOR_RENDER;
+    }
+
+    protected void setupSceneGLWork() {
+        //override in subclass
     }
 
     public void destroyScene() {
         removeAllNodes();
-        sceneNeedsSetup = true;
+
+        //update the scene state;
+        sceneState = SceneState.NOT_SETUP;
     }
 
     public void addNodes(List<AglNode> nodes) {
@@ -220,7 +267,7 @@ public class AglScene implements AglUpdateable {
         return context;
     }
 
-    public boolean doesSceneNeedSetup() {
-        return sceneNeedsSetup;
+    public SceneState getSceneState() {
+        return sceneState;
     }
 }

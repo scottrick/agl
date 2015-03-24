@@ -10,7 +10,6 @@ import com.hatfat.agl.AglPerspectiveCamera;
 import com.hatfat.agl.AglRenderable;
 import com.hatfat.agl.AglScene;
 import com.hatfat.agl.mesh.AglBBMesh;
-import com.hatfat.agl.mesh.AglMesh;
 import com.hatfat.agl.modifiers.SpinModifier;
 import com.hatfat.agl.util.Vec3;
 
@@ -23,8 +22,11 @@ public class TestScene extends AglScene {
     private Random rand;
 
     private int activeNodeIndex;
+    private AglBBMesh[] bbMeshes;
     private AglNode[] wireframeNodes;
     private AglNode[] meshNodes;
+
+    int numTestNodes = 8;
 
     public TestScene(Context context) {
         super(context);
@@ -40,83 +42,47 @@ public class TestScene extends AglScene {
         setCamera(camera);
     }
 
-    @Override
-    public void setupScene() {
-        super.setupScene();
+    @Override protected void setupSceneBackgroundWork() {
+        super.setupSceneBackgroundWork();
+
+        activeNodeIndex = 0;
+        bbMeshes = new AglBBMesh[numTestNodes];
+        wireframeNodes = new AglNode[numTestNodes];
+        meshNodes = new AglNode[numTestNodes];
+
+        for (int i = 0; i < numTestNodes; i++) {
+            String resourceName = "mesh" + i;
+            int resId = getContext().getResources().getIdentifier(resourceName, "raw", getContext().getPackageName());
+            InputStream in = getContext().getResources().openRawResource(resId);
+
+            try {
+                bbMeshes[i] = AglBBMesh.readFromStreamAsBytes(in);
+            }
+            catch (IOException e) {
+                Log.e("TestScene", "Error loading BB mesh resources.");
+            }
+        }
+    }
+
+    @Override protected void setupSceneGLWork() {
+        super.setupSceneGLWork();
 
         GLES20.glEnable(GLES20.GL_POLYGON_OFFSET_FILL);
         GLES20.glPolygonOffset(1.0f, 1.0f);
 
-        int numTestNodes = 8;
-        activeNodeIndex = 0;
-        wireframeNodes = new AglNode[numTestNodes];
-        meshNodes = new AglNode[numTestNodes];
-
         Vec3 spinVec = new Vec3(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
-        spinVec = new Vec3(0.0f, 1.0f, 0.0f);
         spinVec.normalize();
 
-        AglMesh testMesh = null;
         float rotateSpeed = 3.0f;
 
-        boolean newWay = true;
+        for (int i = 0; i < numTestNodes; i++) {
+            AglBBMesh shapeMesh = bbMeshes[i];
 
-        long setupStartTime = System.currentTimeMillis();
-
-        if (newWay) {
-            Context context = getContext();
-
-            for (int i = 0; i < numTestNodes; i++) {
-                String resourceName = "mesh" + i;
-                int resId = context.getResources().getIdentifier(resourceName, "raw", context.getPackageName());
-
-                InputStream in = context.getResources().openRawResource(resId);
-
-                AglBBMesh shapeMesh = null;
-
-                try {
-                    shapeMesh = AglBBMesh.readFromStreamAsBytes(in);
-                }
-                catch (IOException e) {
-                    Log.e("TestScene", "Error loading BB mesh resources.");
-                }
-
-                if (shapeMesh != null) {
-                    AglRenderable wireframeRenderable = shapeMesh.toWireframeRenderable();
-                    AglRenderable coloredRenderable = shapeMesh.toColoredGeometryRenderable();
-
-                    AglNode meshNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), coloredRenderable);
-                    meshNode.addModifier(new SpinModifier(meshNode, rotateSpeed, spinVec));
-                    meshNode.setShouldRender(false);
-                    meshNodes[i] = meshNode;
-                    addNode(meshNode);
-
-                    AglNode wireframeNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f),
-                            wireframeRenderable);
-                    wireframeNode.addModifier(new SpinModifier(wireframeNode, rotateSpeed, spinVec));
-                    wireframeNode.setShouldRender(false);
-                    wireframeNodes[i] = wireframeNode;
-                    addNode(wireframeNode);
-                }
-            }
-        }
-        else {
-            for (int i = 0; i < numTestNodes; i++) {
-                if (testMesh == null) {
-                    testMesh = AglMesh.makeIcosahedron();
-                } else {
-                    testMesh = testMesh.splitMesh();
-                }
-
-                AglBBMesh shapeMesh = AglBBMesh.makeFromMesh(testMesh);
+            if (shapeMesh != null) {
                 AglRenderable wireframeRenderable = shapeMesh.toWireframeRenderable();
+                AglRenderable coloredRenderable = shapeMesh.toColoredGeometryRenderable();
 
-//            AglRenderable wireframeRenderable = testMesh.toWireframeRenderable();
-
-                AglRenderable meshRenderable = testMesh.toColoredGeometryRenderable();
-//            AglRenderable pentagonRenderable = shapeMesh.createWireframe();
-
-                AglNode meshNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), meshRenderable);
+                AglNode meshNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), coloredRenderable);
                 meshNode.addModifier(new SpinModifier(meshNode, rotateSpeed, spinVec));
                 meshNode.setShouldRender(false);
                 meshNodes[i] = meshNode;
@@ -130,9 +96,6 @@ public class TestScene extends AglScene {
                 addNode(wireframeNode);
             }
         }
-
-        long setupEndTime = System.currentTimeMillis();
-        Log.i("TestScene", "[" + numTestNodes + "] TestScene setup took " + (setupEndTime - setupStartTime) + " milliseconds.");
 
         meshNodes[activeNodeIndex].setShouldRender(true);
         wireframeNodes[activeNodeIndex].setShouldRender(true);
