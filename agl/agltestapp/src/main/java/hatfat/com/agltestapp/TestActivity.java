@@ -23,7 +23,6 @@ public class TestActivity extends AglActivity implements View.OnTouchListener {
 
         final TestScene aglScene = new TestScene(getApplicationContext());
         aglSurfaceView.setScene(aglScene);
-
         aglSurfaceView.setOnTouchListener(this);
 
         RelativeLayout container = (RelativeLayout) findViewById(R.id.base_layout_content_view);
