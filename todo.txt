@@ -1,6 +1,8 @@
 Agl TODO
 ---------------------------
 
+figure out how we want to handle changing screens, scenes, UI, etc
+
 Update quest to use new scene loading system
 Add a super lightweight loading scene, which is displayed while new scenes are being setup
 
