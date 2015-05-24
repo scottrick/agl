@@ -1,13 +1,12 @@
 Agl TODO
 ---------------------------
+-fix pressing home and going back in not working right
 
 figure out how we want to handle changing screens, scenes, UI, etc
 
-Update quest to use new scene loading system
-Add a super lightweight loading scene, which is displayed while new scenes are being setup
-
 textures on tiles!
  -with bump mapping
+ -texture/bumpmap support
 
 improve camera handling
  -scale rotation based on zoom and mesh size???
@@ -17,8 +16,6 @@ improve camera handling
 Basic terrain generation?
 
 Joe & Mike's phones aren't drawing correctly
-
--texture/bumpmap support
 
 -Need to figure out how I want to handle lighting.  Then create:
 	-texture shader w/ lighting
