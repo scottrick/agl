@@ -8,14 +8,16 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 100
-        versionName "0.1.0"
+        versionCode 200
+        versionName "0.2.0"
     }
 
     buildTypes {
         release {
+            debuggable true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            zipAlignEnabled true
         }
     }
 }
@@ -36,7 +38,7 @@ uploadArchives {
             repository(url: "file:////Users/scottrick/.m2/repository")
             pom.groupId = 'com.hatfat.agl'
             pom.artifactId = 'agl-lib'
-            pom.version = '0.1.0'
+            pom.version = '0.2.0'
         }
     }
 }

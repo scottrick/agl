@@ -1,6 +1,6 @@
 package com.hatfat.agl.modifiers;
 
-import com.hatfat.agl.AglNode;
+import com.hatfat.agl.component.Transform;
 import com.hatfat.agl.util.Quat;
 import com.hatfat.agl.util.Vec3;
 
@@ -19,12 +19,12 @@ public class SpinModifier implements Modifier {
         scratch = new Quat();
     }
 
-    @Override public void update(float time, float deltaTime, AglNode node) {
+    @Override public void update(float deltaTime, Transform transform) {
         if (lastDeltaTime != deltaTime) {
             lastDeltaTime = deltaTime;
             scratch.setWithRotationInDegrees(degreesPerSecond * deltaTime, axis);
         }
 
-        node.posQuat.quat.rotateBy(scratch);
+        transform.posQuat.quat.rotateBy(scratch);
     }
 }

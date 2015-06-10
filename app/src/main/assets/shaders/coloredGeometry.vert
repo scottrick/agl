@@ -17,10 +17,8 @@ void main()
 {
     gl_Position = proj * view * model * vec4(position, 1.0);
 	vertexColor = color;
-	vec4 temp = model * vec4(normal, 0.0);
+	fragNormal = (view * model * vec4(normal, 0.0)).xyz;
 
-    vec4 vertPos4 = model * vec4(position, 1.0);
+    vec4 vertPos4 = view * model * vec4(position, 1.0);
 	vertPos = vec3(vertPos4) / vertPos4.w;
-
-	fragNormal = temp.xyz;
 }

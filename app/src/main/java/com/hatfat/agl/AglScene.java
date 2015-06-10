@@ -6,8 +6,14 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.hatfat.agl.app.AglRenderer;
+import com.hatfat.agl.component.ComponentType;
+import com.hatfat.agl.component.LightComponent;
+import com.hatfat.agl.component.RenderableComponent;
+import com.hatfat.agl.component.Transform;
+import com.hatfat.agl.entity.AglEntity;
 import com.hatfat.agl.render.AglRenderable;
-import com.hatfat.agl.util.Color;
+import com.hatfat.agl.system.AglSystem;
+import com.hatfat.agl.system.TransformModifierSystem;
 import com.hatfat.agl.util.Matrix;
 import com.hatfat.agl.util.Vec3;
 
@@ -15,10 +21,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Created by scottrick on 7/31/14.
- */
-public class AglScene implements AglUpdateable {
+public class AglScene {
 
     public enum SceneState {
         NOT_SETUP,
@@ -28,26 +31,32 @@ public class AglScene implements AglUpdateable {
         READY_FOR_RENDER,
     }
 
-    protected AglCamera                             camera;
-    protected HashMap<AglRenderable, List<AglNode>> renderableHashMap;
+    protected AglCamera                               camera;
+    protected HashMap<AglRenderable, List<AglEntity>> renderableHashMap;
 
-    protected int numNodes    = 0;
-    protected int maxNumNodes = 5 * 1000;
-    protected AglNode[] nodes;
+    /* entity management */
+    private int numEntities    = 0;
+    private int maxNumEntities = 5 * 1000;
+    private final AglEntity[] entities;
 
-    protected AglPointLight globalLight;
+    /* systems that are used in this scene */
+    private List<AglSystem> systems = new LinkedList<>();
 
+    /* just keep track of the global light here for now */
+    protected AglEntity globalLightEntity;
+
+    /* scene state info */
+    protected boolean isPaused;
     private SceneState sceneState = SceneState.NOT_SETUP;
 
     private Context context;
 
-    //scratch
-    protected int updateInt = 0;
-
     public AglScene(Context context) {
         this.context = context;
 
-        nodes = new AglNode[maxNumNodes];
+        systems.add(new TransformModifierSystem());
+
+        entities = new AglEntity[maxNumEntities];
         renderableHashMap = new HashMap<>();
 
         camera = new AglPerspectiveCamera(
@@ -56,13 +65,15 @@ public class AglScene implements AglUpdateable {
                 new Vec3(0.0f, 1.0f, 0.0f),
                 60.0f, 1.0f, 0.1f, 1000.0f);
 
-        globalLight = new AglPointLight(new Vec3(0.0f, 0.0f, 1.0f),
-                new Color(1.0f, 1.0f, 1.0f, 1.0f));
+        globalLightEntity = new AglEntity("default global light");
+        globalLightEntity.addComponent(new LightComponent());
+        globalLightEntity.addComponent(new Transform(new Vec3(0.0f, 0.0f, 1.0f)));
+        addEntity(globalLightEntity);
     }
 
     public final void setupSceneBackground() {
         sceneState = SceneState.SETTING_UP_BACKGROUND;
-        final long setupStartTime = System.currentTimeMillis();
+        final long setupStartTime = java.lang.System.currentTimeMillis();
 
         new AsyncTask<Void, Void, Void>() {
             @Override protected Void doInBackground(Void... params) {
@@ -73,7 +84,7 @@ public class AglScene implements AglUpdateable {
             @Override protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
 
-                long setupEndTime = System.currentTimeMillis();
+                long setupEndTime = java.lang.System.currentTimeMillis();
                 Log.i("AglScene", AglScene.this.getClass().getSimpleName() + " background setup took " + (setupEndTime - setupStartTime) + " milliseconds.");
 
                 sceneState = SceneState.READY_FOR_GL_SETUP;
@@ -87,11 +98,11 @@ public class AglScene implements AglUpdateable {
 
     public final void setupSceneGL(AglRenderer renderer) {
         sceneState = SceneState.SETTING_UP_GL_THREAD;
-        final long setupStartTime = System.currentTimeMillis();
+        final long setupStartTime = java.lang.System.currentTimeMillis();
 
         setupSceneGLWork(renderer);
 
-        long setupEndTime = System.currentTimeMillis();
+        long setupEndTime = java.lang.System.currentTimeMillis();
         Log.i("AglScene", AglScene.this.getClass().getSimpleName() + " GL setup took " + (setupEndTime - setupStartTime) + " milliseconds.");
 
         sceneState = SceneState.READY_FOR_RENDER;
@@ -102,87 +113,98 @@ public class AglScene implements AglUpdateable {
     }
 
     public void destroyScene(AglRenderer renderer) {
-        removeAllNodes();
+        removeAllEntities();
 
         //update the scene state;
         sceneState = SceneState.NOT_SETUP;
     }
 
-    public void addNodes(List<AglNode> nodes) {
-        for (AglNode node : nodes) {
-            addNode(node);
+    public void addEntities(List<AglEntity> entities) {
+        for (AglEntity entity : entities) {
+            addEntity(entity);
         }
     }
 
-    public void addNode(AglNode node) {
-        if (numNodes + 1 >= maxNumNodes) {
-            throw new RuntimeException("Can't add more nodes!");
+    public void addEntity(AglEntity entity) {
+        if (numEntities + 1 >= maxNumEntities) {
+            throw new RuntimeException("Can't add more entities!");
         }
 
-        nodes[numNodes] = node;
-        numNodes++;
+        entities[numEntities] = entity;
+        numEntities++;
 
-        addNodeToRenderableHashMap(node);
+        addEntityToRenderableHashMap(entity);
     }
 
-    public void removeNode(AglNode node) {
+    public void removeEntity(AglEntity entity) {
         int modifierIndex = -1;
 
-        for (int i = 0; i < numNodes; i++) {
-            if (nodes[i] == node) {
+        for (int i = 0; i < numEntities; i++) {
+            if (entities[i] == entity) {
                 modifierIndex = i;
                 break;
             }
         }
 
         if (modifierIndex < 0) {
-            //modifier was not on this node!
+            //modifier was not on this entity!
             return;
         }
 
-        nodes[modifierIndex] = nodes[numNodes - 1]; //swap the last modifier with the modifier we are removing
+        entities[modifierIndex] = entities[numEntities - 1]; //swap the last modifier with the modifier we are removing
 
-        numNodes--;
+        numEntities--;
 
-        nodes[numNodes] = null;
+        entities[numEntities] = null;
 
-        removeNodeFromRenderableHashMap(node);
+        removeEntityFromRenderableHashMap(entity);
     }
 
-    private void addNodeToRenderableHashMap(AglNode node) {
-        //update the renderables hashmap
-        List<AglNode> renderableNodeList = renderableHashMap.get(node.getRenderable());
+    private void addEntityToRenderableHashMap(AglEntity entity) {
+        List<RenderableComponent> renderableComponents = entity.getComponentsByType(
+                ComponentType.RENDERABLE);
 
-        if (renderableNodeList == null) {
-            renderableNodeList = new LinkedList<>();
-            renderableHashMap.put(node.getRenderable(), renderableNodeList);
-        }
+        //update the renderables hashmap for each renderable component
+        for (RenderableComponent renderableComponent : renderableComponents) {
+            List<AglEntity> renderableEntityList = renderableHashMap.get(renderableComponent.getRenderable());
 
-        renderableNodeList.add(node);
-    }
+            if (renderableEntityList == null) {
+                renderableEntityList = new LinkedList<>();
+                renderableHashMap.put(renderableComponent.getRenderable(), renderableEntityList);
+            }
 
-    private void removeNodeFromRenderableHashMap(AglNode node) {
-        //update the renderables hashmap
-        List<AglNode> renderableNodeList = renderableHashMap.get(node.getRenderable());
-
-        if (renderableNodeList == null) {
-            throw new RuntimeException("shouldn't ever happen...");
-        }
-
-        renderableNodeList.remove(node);
-
-        if (renderableNodeList.size() <= 0) {
-            //no nodes with this type of renderable left, so we can remove this list
-            renderableHashMap.remove(node.getRenderable());
+            renderableEntityList.add(entity);
         }
     }
 
-    protected void removeAllNodes() {
-        for (int i = 0; i < numNodes; i++) {
-            nodes[i] = null;
+    private void removeEntityFromRenderableHashMap(AglEntity entity) {
+        List<RenderableComponent> renderableComponents = entity.getComponentsByType(
+                ComponentType.RENDERABLE);
+
+        for (RenderableComponent renderableComponent : renderableComponents) {
+            //update the renderables hashmap
+            List<AglEntity> renderableEntityList = renderableHashMap
+                    .get(renderableComponent.getRenderable());
+
+            if (renderableEntityList == null) {
+                throw new RuntimeException("shouldn't ever happen...");
+            }
+
+            renderableEntityList.remove(entity);
+
+            if (renderableEntityList.size() <= 0) {
+                //no entities with this type of renderable left, so we can remove this list
+                renderableHashMap.remove(renderableComponent.getRenderable());
+            }
+        }
+    }
+
+    protected void removeAllEntities() {
+        for (int i = 0; i < numEntities; i++) {
+            entities[i] = null;
         }
 
-        numNodes = 0;
+        numEntities = 0;
         renderableHashMap.clear();
     }
 
@@ -191,6 +213,9 @@ public class AglScene implements AglUpdateable {
         float viewMatrix[];
         float projMatrix[];
         Matrix modelMatrix = new Matrix();
+
+        LightComponent lightComponent = globalLightEntity.getComponentByType(ComponentType.LIGHT);
+        Transform lightTransform = globalLightEntity.getComponentByType(ComponentType.TRANSFORM);
 
         int projectionUniformLocation = 0;
         int viewUniformLocation = 0;
@@ -218,20 +243,32 @@ public class AglScene implements AglUpdateable {
 
                 GLES20.glUniformMatrix4fv(projectionUniformLocation, 1, false, projMatrix, 0);
                 GLES20.glUniformMatrix4fv(viewUniformLocation, 1, false, viewMatrix, 0);
-                GLES20.glUniform3f(lightDirUniformLocation, globalLight.lightDir.x, globalLight.lightDir.y, globalLight.lightDir.z);
-                GLES20.glUniform4f(lightColorUniformLocation, globalLight.lightColor.r, globalLight.lightColor.g, globalLight.lightColor.b, globalLight.lightColor.a);
+                GLES20.glUniform4f(lightColorUniformLocation, lightComponent.lightColor.r, lightComponent.lightColor.g, lightComponent.lightColor.b, lightComponent.lightColor.a);
             }
 
             currentRenderable.prepareRender(activeProgram);
 
-            List<AglNode> currentNodes = renderableHashMap.get(currentRenderable);
-            for (AglNode node : currentNodes) {
-                //render each node of this renderable type
-                if (!node.shouldRender) {
+            List<AglEntity> currentEntities = renderableHashMap.get(currentRenderable);
+            for (AglEntity entity : currentEntities) {
+                RenderableComponent renderableComponent = entity.getComponentByType(ComponentType.RENDERABLE);
+                Transform transform = entity.getComponentByType(ComponentType.TRANSFORM);
+
+                if (renderableComponent == null || transform == null) {
+                    //entity doesn't have required components to render
                     continue;
                 }
 
-                node.getModelMatrix(modelMatrix);
+                if (!renderableComponent.shouldRender()) {
+                    continue;
+                }
+
+                GLES20.glUniform3f(lightDirUniformLocation,
+                        lightTransform.getAbsolutePos().x - transform.getAbsolutePos().x,
+                        lightTransform.getAbsolutePos().y - transform.getAbsolutePos().y,
+                        lightTransform.getAbsolutePos().z - transform.getAbsolutePos().z);
+
+                //render each entity of this renderable type
+                transform.getModelMatrix(modelMatrix);
                 GLES20.glUniformMatrix4fv(modelUniformLocation, 1, false, modelMatrix.m, 0);
 
                 currentRenderable.render();
@@ -246,10 +283,13 @@ public class AglScene implements AglUpdateable {
         }
     }
 
-    @Override
     public void update(float time, float deltaTime) {
-        for (updateInt = 0; updateInt < numNodes; updateInt++) {
-            nodes[updateInt].update(time, deltaTime);
+        if (isPaused) {
+            deltaTime = 0.0f;
+        }
+
+        for (AglSystem system : systems) {
+            system.updateSystem(this, deltaTime);
         }
     }
 
@@ -265,8 +305,8 @@ public class AglScene implements AglUpdateable {
         return camera;
     }
 
-    public AglPointLight getGlobalLight() {
-        return globalLight;
+    public AglEntity getGlobalLight() {
+        return globalLightEntity;
     }
 
     protected Context getContext() {
@@ -275,5 +315,25 @@ public class AglScene implements AglUpdateable {
 
     public SceneState getSceneState() {
         return sceneState;
+    }
+
+    public boolean isPaused() {
+        return isPaused;
+    }
+
+    public void pause() {
+        isPaused = true;
+    }
+
+    public void unpause() {
+        isPaused = false;
+    }
+
+    public int getNumEntities() {
+        return numEntities;
+    }
+
+    public AglEntity[] getEntities() {
+        return entities;
     }
 }

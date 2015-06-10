@@ -1,8 +1,10 @@
 package com.hatfat.agl.mesh;
 
+import com.hatfat.agl.render.AglBumpMappedGeometry;
 import com.hatfat.agl.render.AglColoredGeometry;
 import com.hatfat.agl.render.AglTexturedGeometry;
 import com.hatfat.agl.render.AglWireframe;
+import com.hatfat.agl.textures.AglTexture;
 import com.hatfat.agl.textures.AglTextureManager;
 
 public class TestRenderableFactory {
@@ -156,6 +158,73 @@ public class TestRenderableFactory {
         AglTexturedGeometry texturedCube = new AglTexturedGeometry(vertices, 24, elements, elements.length, textureManager.getDefaultTexture(), isLit);
 
         return texturedCube;
+    }
+
+    public static AglBumpMappedGeometry createNormalMappedTextureCube(AglTexture texture, AglTexture normalTexture, AglTexture specularTexture) {
+
+        float vertices[] = {
+                //vertex (x, y, z), texture (s, t),    normal (x, y, z),    tangent (x, y, z),     bitangent (x, y, z)
+
+                //FRONT
+                -1f,  1f,  1f,        0f,  1f,      0f,  0f,  1f,      0f,  0f,  0f,      0f,  0f,  0f,      //0
+                 1f,  1f,  1f,        1f,  1f,      0f,  0f,  1f,      0f,  0f,  0f,      0f,  0f,  0f,      //1
+                 1f, -1f,  1f,        1f,  0f,      0f,  0f,  1f,      0f,  0f,  0f,      0f,  0f,  0f,      //2
+                -1f, -1f,  1f,        0f,  0f,      0f,  0f,  1f,      0f,  0f,  0f,      0f,  0f,  0f,      //3
+
+                 //RIGHT
+                 1f,  1f,  1f,        0f,  1f,      1f,  0f,  0f,      0f,  0f,  0f,      0f,  0f,  0f,      //4
+                 1f,  1f, -1f,        1f,  1f,      1f,  0f,  0f,      0f,  0f,  0f,      0f,  0f,  0f,      //5
+                 1f, -1f, -1f,        1f,  0f,      1f,  0f,  0f,      0f,  0f,  0f,      0f,  0f,  0f,      //6
+                 1f, -1f,  1f,        0f,  0f,      1f,  0f,  0f,      0f,  0f,  0f,      0f,  0f,  0f,      //7
+
+                //LEFT
+                -1f,  1f,  1f,        0f,  1f,     -1f,  0f,  0f,      0f,  0f,  0f,      0f,  0f,  0f,      //8
+                -1f,  1f, -1f,        1f,  1f,     -1f,  0f,  0f,      0f,  0f,  0f,      0f,  0f,  0f,      //9
+                -1f, -1f, -1f,        1f,  0f,     -1f,  0f,  0f,      0f,  0f,  0f,      0f,  0f,  0f,      //10
+                -1f, -1f,  1f,        0f,  0f,     -1f,  0f,  0f,      0f,  0f,  0f,      0f,  0f,  0f,      //11
+
+                //BACK
+                -1f,  1f, -1f,        0f,  1f,      0f,  0f, -1f,      0f,  0f,  0f,      0f,  0f,  0f,      //12
+                1f,   1f, -1f,        1f,  1f,      0f,  0f, -1f,      0f,  0f,  0f,      0f,  0f,  0f,      //13
+                1f,  -1f, -1f,        1f,  0f,      0f,  0f, -1f,      0f,  0f,  0f,      0f,  0f,  0f,      //14
+                -1f, -1f, -1f,        0f,  0f,      0f,  0f, -1f,      0f,  0f,  0f,      0f,  0f,  0f,      //15
+
+                //TOP
+                -1f,  1f, -1f,        0f,  1f,      0f,  1f,  0f,      0f,  0f,  0f,      0f,  0f,  0f,      //16
+                 1f,  1f, -1f,        1f,  1f,      0f,  1f,  0f,      0f,  0f,  0f,      0f,  0f,  0f,      //17
+                 1f,  1f,  1f,        1f,  0f,      0f,  1f,  0f,      0f,  0f,  0f,      0f,  0f,  0f,      //18
+                -1f,  1f,  1f,        0f,  0f,      0f,  1f,  0f,      0f,  0f,  0f,      0f,  0f,  0f,      //19
+
+                //BOTTOM
+                -1f, -1f, -1f,        0f,  1f,      0f, -1f,  0f,      0f,  0f,  0f,      0f,  0f,  0f,      //20
+                 1f, -1f, -1f,        1f,  1f,      0f, -1f,  0f,      0f,  0f,  0f,      0f,  0f,  0f,      //21
+                 1f, -1f,  1f,        1f,  0f,      0f, -1f,  0f,      0f,  0f,  0f,      0f,  0f,  0f,      //22
+                -1f, -1f,  1f,        0f,  0f,      0f, -1f,  0f,      0f,  0f,  0f,      0f,  0f,  0f,      //23
+        };
+
+        int elements[] = {
+                0, 2, 1, //front
+                0, 3, 2,
+
+                6, 5, 4, //right
+                6, 4, 7,
+
+                8, 9, 10, //left
+                8, 10, 11,
+
+                12, 13, 14, //back
+                12, 14, 15,
+
+                16, 18, 17, //top
+                16, 19, 18,
+
+                20, 21, 22, //bottom
+                20, 22, 23,
+        };
+
+        AglBumpMappedGeometry normalMappedCube = new AglBumpMappedGeometry(vertices, 24, elements, elements.length, texture, normalTexture, specularTexture);
+
+        return normalMappedCube;
     }
 
     public static AglColoredGeometry createCube() {

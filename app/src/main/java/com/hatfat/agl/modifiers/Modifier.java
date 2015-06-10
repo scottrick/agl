@@ -1,7 +1,7 @@
 package com.hatfat.agl.modifiers;
 
-import com.hatfat.agl.AglNode;
+import com.hatfat.agl.component.Transform;
 
 public interface Modifier {
-    void update(float time, float deltaTime, AglNode node);
+    void update(float deltaTime, Transform transform);
 }

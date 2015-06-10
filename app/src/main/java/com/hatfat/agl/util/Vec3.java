@@ -44,6 +44,12 @@ public class Vec3 {
         this.z *= scale;
     }
 
+    public void add(Vec3 add) {
+        this.x += add.x;
+        this.y += add.y;
+        this.z += add.z;
+    }
+
     public float getMagnitude() {
         return (float) Math.sqrt(x * x + y * y + z * z);
     }

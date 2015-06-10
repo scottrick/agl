@@ -1,12 +1,35 @@
 Agl TODO
 ---------------------------
--fix pressing home and going back in not working right
+---> BillBoard Renderables
 
-figure out how we want to handle changing screens, scenes, UI, etc
+Implement ECS (Entity Component System) in Agl
+	What components will we have?
+		Graphics, Transform, Physics, Audio, Input, StateSaving, Particles
+	-use OTTO to broadcast messages
+	-use entityIds to keep ahold of other entities.  This will make it easy to load/save without having to setup pointers.
 
-textures on tiles!
- -with bump mapping
- -texture/bumpmap support
+AglScene
+	List<Entity> entities			//array of all entities
+
+Entity
+	Integer id   					//entity index to quickly find an entity in the scene's entity array
+	List<Component> components 		//list of components
+
+Component
+	bitflag with base component type
+	Component specific data
+
+System
+	Each system can update independently of the other systems, and at different rates.
+	When updating, the system looks through all entities and only updates the ones which match its required components.
+		We can use the component bitflags to make this check quick.
+
+
+
+
+
+
+
 
 improve camera handling
  -scale rotation based on zoom and mesh size???
@@ -17,11 +40,6 @@ Basic terrain generation?
 
 Joe & Mike's phones aren't drawing correctly
 
--Need to figure out how I want to handle lighting.  Then create:
-	-texture shader w/ lighting
-	-bump-mapped shader w/ lighting
-	-colored geometry shader w/ lighting
-
 -glGetError is SLOW.  Only do it in debug builds (not release builds).
 
 -simple particle engine + effects
@@ -31,6 +49,9 @@ Joe & Mike's phones aren't drawing correctly
 -enable multisampling
 
 -might want to write a custom wrapper class to handle this array management / iterating
+
+possible textures to use? 
+	https://github.com/The-Yak/NobiaxTexturePack
 
 
 

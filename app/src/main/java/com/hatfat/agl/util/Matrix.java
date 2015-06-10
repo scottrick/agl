@@ -173,4 +173,8 @@ public class Matrix {
         m[13] += t.y;
         m[14] += t.z;
     }
+
+    public Vec3 getPositionOffset() {
+        return new Vec3(m[12], m[13], m[14]);
+    }
 }

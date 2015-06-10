@@ -11,6 +11,7 @@ public class AglTextureManager {
     private Context                     context;
 
     public final static String defaultTextureName = "default_texture";
+    public final static String defaultNormapMapName = "default_normal_map";
 
     public AglTextureManager(Context context) {
         this.context = context;
@@ -37,6 +38,10 @@ public class AglTextureManager {
 
     public AglTexture getDefaultTexture() {
         return getTexture(defaultTextureName);
+    }
+
+    public AglTexture getDefaultNormapMapTexture() {
+        return getTexture(defaultNormapMapName);
     }
 
     /*

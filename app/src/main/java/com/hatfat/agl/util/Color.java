@@ -15,4 +15,11 @@ public class Color {
         this.b = b;
         this.a = a;
     }
+
+    public Color() {
+        this.r = 1.0f;
+        this.g = 1.0f;
+        this.b = 1.0f;
+        this.a = 1.0f;
+    }
 }

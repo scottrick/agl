@@ -4,6 +4,10 @@ import android.content.Context;
 
 import com.hatfat.agl.app.AglApplication;
 import com.hatfat.agl.app.AglRenderer;
+import com.hatfat.agl.component.ModifierComponent;
+import com.hatfat.agl.component.RenderableComponent;
+import com.hatfat.agl.component.Transform;
+import com.hatfat.agl.entity.AglEntity;
 import com.hatfat.agl.mesh.TestRenderableFactory;
 import com.hatfat.agl.modifiers.SpinModifier;
 import com.hatfat.agl.render.AglRenderable;
@@ -18,8 +22,6 @@ public class AglLoadingScene extends AglScene {
 
     @Inject AglRandom random;
 
-    private AglNode loadingNode = null;
-
     public AglLoadingScene(Context context) {
         super(context);
 
@@ -33,24 +35,29 @@ public class AglLoadingScene extends AglScene {
                 60.0f, 1.0f, 0.1f, 100.0f);
 
         setCamera(camera);
-
-        Vec3 newLightDir = new Vec3(0.1f, 0.1f, 1.0f);
-        newLightDir.normalize();
-        getGlobalLight().lightDir = newLightDir;
     }
 
     @Override protected void setupSceneGLWork(AglRenderer renderer) {
         super.setupSceneGLWork(renderer);
 
+        AglEntity loadingEntity = new AglEntity("Loading Entity");
+
         AglRenderable loadingRenderable = TestRenderableFactory.createIcosahedronWireframe();
-        loadingNode = new AglNode(new Vec3(0.0f, 0.0f, 0.0f), loadingRenderable);
+
+        RenderableComponent renderableComponent = new RenderableComponent(loadingRenderable);
+        ModifierComponent modifierComponent = new ModifierComponent();
+        Transform transform = new Transform();
 
         Random rand = random.get();
         Vec3 spinVec = new Vec3(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
         spinVec.normalize();
 
-        loadingNode.addModifier(new SpinModifier(300.0f, spinVec));
+        modifierComponent.addModifier(new SpinModifier(300.0f, spinVec));
 
-        addNode(loadingNode);
+        loadingEntity.addComponent(modifierComponent);
+        loadingEntity.addComponent(renderableComponent);
+        loadingEntity.addComponent(transform);
+
+        addEntity(loadingEntity);
     }
 }

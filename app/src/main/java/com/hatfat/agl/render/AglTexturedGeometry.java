@@ -45,12 +45,14 @@ public class AglTexturedGeometry implements AglRenderable {
 
         //setup the vbo buffer
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, vbo);
-        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, AglDef.SIZEOF_FLOAT * numVertices * 8, vertexBuffer, GLES20.GL_STATIC_DRAW);
+        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, AglDef.SIZEOF_FLOAT * numVertices * 8,
+                vertexBuffer, GLES20.GL_STATIC_DRAW);
 
         //setup ebo
         this.numElements = numElements;
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, ebo);
-        GLES20.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER, AglDef.SIZEOF_INT * numElements, indexBuffer, GLES20.GL_STATIC_DRAW);
+        GLES20.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER, AglDef.SIZEOF_INT * numElements,
+                indexBuffer, GLES20.GL_STATIC_DRAW);
 
         //store texture
         this.texture = texture;
@@ -63,15 +65,22 @@ public class AglTexturedGeometry implements AglRenderable {
 
         int posAttrib = GLES20.glGetAttribLocation(shaderProgram, "position");
         GLES20.glEnableVertexAttribArray(posAttrib);
-        GLES20.glVertexAttribPointer(posAttrib, 3, GLES20.GL_FLOAT, false, 8 * AglDef.SIZEOF_FLOAT, 0);
+        GLES20.glVertexAttribPointer(posAttrib, 3, GLES20.GL_FLOAT, false,
+                8 * AglDef.SIZEOF_FLOAT, 0);
 
         int textureAttrib = GLES20.glGetAttribLocation(shaderProgram, "texture");
         GLES20.glEnableVertexAttribArray(textureAttrib);
-        GLES20.glVertexAttribPointer(textureAttrib, 2, GLES20.GL_FLOAT, false, 8 * AglDef.SIZEOF_FLOAT, 3 * AglDef.SIZEOF_FLOAT);
+        GLES20.glVertexAttribPointer(textureAttrib, 2, GLES20.GL_FLOAT, false,
+                8 * AglDef.SIZEOF_FLOAT, 3 * AglDef.SIZEOF_FLOAT);
 
         int normalAttrib = GLES20.glGetAttribLocation(shaderProgram, "normal");
-        GLES20.glEnableVertexAttribArray(normalAttrib);
-        GLES20.glVertexAttribPointer(normalAttrib, 3, GLES20.GL_FLOAT, false, 8 * AglDef.SIZEOF_FLOAT, 5 * AglDef.SIZEOF_FLOAT);
+        if (normalAttrib != -1) {
+            //the normal attribute isn't used in the basicTexture program, and might be
+            //removed by the shader compiler on some phones.  Don't hook it up in that case!
+            GLES20.glEnableVertexAttribArray(normalAttrib);
+            GLES20.glVertexAttribPointer(normalAttrib, 3, GLES20.GL_FLOAT, false,
+                    8 * AglDef.SIZEOF_FLOAT, 5 * AglDef.SIZEOF_FLOAT);
+        }
 
         int textureSamplerUniform = GLES20.glGetUniformLocation(shaderProgram, "textureSampler");
 
