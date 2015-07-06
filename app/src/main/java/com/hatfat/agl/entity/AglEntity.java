@@ -8,7 +8,7 @@ import java.util.List;
 
 public class AglEntity {
 
-    /* entity scene index id */
+    /* entity scene id */
     public int entityId;
 
     /* entity name, used for debugging */
@@ -22,7 +22,8 @@ public class AglEntity {
     public AglEntity(String entityName) {
         if (entityName != null) {
             this.entityName = entityName;
-        } else {
+        }
+        else {
             this.entityName = this.getClass().getSimpleName();
         }
 

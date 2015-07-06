@@ -8,5 +8,6 @@ public enum ComponentType {
     AUDIO,
     INPUT,
     LIGHT,
+    CAMERA,
     MODIFIER;
 }

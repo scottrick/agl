@@ -10,9 +10,12 @@ import com.hatfat.agl.component.ComponentType;
 import com.hatfat.agl.component.LightComponent;
 import com.hatfat.agl.component.RenderableComponent;
 import com.hatfat.agl.component.Transform;
+import com.hatfat.agl.component.camera.CameraComponent;
+import com.hatfat.agl.component.camera.PerspectiveCameraComponent;
 import com.hatfat.agl.entity.AglEntity;
 import com.hatfat.agl.render.AglRenderable;
 import com.hatfat.agl.system.AglSystem;
+import com.hatfat.agl.system.CameraSystem;
 import com.hatfat.agl.system.TransformModifierSystem;
 import com.hatfat.agl.util.Matrix;
 import com.hatfat.agl.util.Vec3;
@@ -31,7 +34,6 @@ public class AglScene {
         READY_FOR_RENDER,
     }
 
-    protected AglCamera                               camera;
     protected HashMap<AglRenderable, List<AglEntity>> renderableHashMap;
 
     /* entity management */
@@ -39,8 +41,15 @@ public class AglScene {
     private int maxNumEntities = 5 * 1000;
     private final AglEntity[] entities;
 
+    /* entity hashmap */
+    private HashMap<Integer, AglEntity> entityHashMap;
+    private int nextEntityId = 1; //start at 1;
+
     /* systems that are used in this scene */
     private List<AglSystem> systems = new LinkedList<>();
+
+    //so we can quickly grab the camera system
+    private CameraSystem cameraSystem;
 
     /* just keep track of the global light here for now */
     protected AglEntity globalLightEntity;
@@ -51,24 +60,36 @@ public class AglScene {
 
     private Context context;
 
-    public AglScene(Context context) {
+    public AglScene(Context context, boolean shouldAddDefaultCamera) {
         this.context = context;
 
         systems.add(new TransformModifierSystem());
+        systems.add(cameraSystem = new CameraSystem());
 
         entities = new AglEntity[maxNumEntities];
         renderableHashMap = new HashMap<>();
+        entityHashMap = new HashMap<>();
 
-        camera = new AglPerspectiveCamera(
-                new Vec3(0.0f, 0.0f, 10.0f),
-                new Vec3(0.0f, 0.0f, 0.0f),
-                new Vec3(0.0f, 1.0f, 0.0f),
-                60.0f, 1.0f, 0.1f, 1000.0f);
+        if (shouldAddDefaultCamera) {
+            addDefaultCamera();
+        }
 
         globalLightEntity = new AglEntity("default global light");
         globalLightEntity.addComponent(new LightComponent());
         globalLightEntity.addComponent(new Transform(new Vec3(0.0f, 0.0f, 1.0f)));
         addEntity(globalLightEntity);
+    }
+
+    private void addDefaultCamera() {
+        AglEntity cameraEntity = new AglEntity("Default Perspective Camera");
+        cameraEntity.addComponent(new PerspectiveCameraComponent(
+                new Vec3(0.0f, 0.0f, 10.0f),
+                new Vec3(0.0f, 0.0f, 0.0f),
+                new Vec3(0.0f, 1.0f, 0.0f),
+                60.0f, 1.0f, 0.1f, 1000.0f));
+
+        addEntity(cameraEntity);
+        cameraSystem.setActiveCameraEntity(cameraEntity);
     }
 
     public final void setupSceneBackground() {
@@ -134,6 +155,7 @@ public class AglScene {
         numEntities++;
 
         addEntityToRenderableHashMap(entity);
+        addEntityToEntityHashMap(entity);
     }
 
     public void removeEntity(AglEntity entity) {
@@ -158,6 +180,22 @@ public class AglScene {
         entities[numEntities] = null;
 
         removeEntityFromRenderableHashMap(entity);
+        removeEntityFromEntityHashMap(entity);
+    }
+
+    private void addEntityToEntityHashMap(AglEntity entity) {
+        entity.entityId = nextEntityId;
+        nextEntityId++;
+
+        //add to the hashMap
+        entityHashMap.put(entity.entityId, entity);
+    }
+
+    private void removeEntityFromEntityHashMap(AglEntity entity) {
+        entity.entityId = 0;
+
+        //remove from the hashmap!
+        entityHashMap.remove(entity.entityId);
     }
 
     private void addEntityToRenderableHashMap(AglEntity entity) {
@@ -262,13 +300,16 @@ public class AglScene {
                     continue;
                 }
 
+                Vec3 lightTransformAbsPos = lightTransform.getAbsolutePos(this);
+                Vec3 transformAbsPos = transform.getAbsolutePos(this);
+
                 GLES20.glUniform3f(lightDirUniformLocation,
-                        lightTransform.getAbsolutePos().x - transform.getAbsolutePos().x,
-                        lightTransform.getAbsolutePos().y - transform.getAbsolutePos().y,
-                        lightTransform.getAbsolutePos().z - transform.getAbsolutePos().z);
+                        lightTransformAbsPos.x - transformAbsPos.x,
+                        lightTransformAbsPos.y - transformAbsPos.y,
+                        lightTransformAbsPos.z - transformAbsPos.z);
 
                 //render each entity of this renderable type
-                transform.getModelMatrix(modelMatrix);
+                transform.getModelMatrix(this, modelMatrix);
                 GLES20.glUniformMatrix4fv(modelUniformLocation, 1, false, modelMatrix.m, 0);
 
                 currentRenderable.render();
@@ -279,7 +320,7 @@ public class AglScene {
 
         int error;
         while ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
-            Log.e("BasicScene", "glError: " + error);
+            Log.e("AglScene", "glError: " + error);
         }
     }
 
@@ -297,12 +338,8 @@ public class AglScene {
         return getSceneState() == SceneState.READY_FOR_RENDER;
     }
 
-    protected void setCamera(AglCamera camera) {
-        this.camera = camera;
-    }
-
-    public AglCamera getCamera() {
-        return camera;
+    public CameraComponent getCamera() {
+        return cameraSystem.getActiveCameraComponent();
     }
 
     public AglEntity getGlobalLight() {
@@ -335,5 +372,9 @@ public class AglScene {
 
     public AglEntity[] getEntities() {
         return entities;
+    }
+
+    public AglEntity getEntityById(int entityId) {
+        return entityHashMap.get(entityId);
     }
 }

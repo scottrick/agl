@@ -1,10 +1,10 @@
-package com.hatfat.agl;
+package com.hatfat.agl.component.camera;
 
 import android.opengl.Matrix;
 
 import com.hatfat.agl.util.Vec3;
 
-public class AglPerspectiveCamera implements AglCamera {
+public class PerspectiveCameraComponent extends CameraComponent {
 
     private float fov;
     private float aspectRatio;
@@ -15,8 +15,10 @@ public class AglPerspectiveCamera implements AglCamera {
     private Vec3 center;
     private Vec3 up;
 
-    public AglPerspectiveCamera(Vec3 eye, Vec3 center, Vec3 up,
+    public PerspectiveCameraComponent(Vec3 eye, Vec3 center, Vec3 up,
                                 float fov, float aspectRatio, float nearPlane, float farPlane) {
+        super();
+
         this.eye = eye;
         this.center = center;
         this.up = up;
@@ -44,15 +46,15 @@ public class AglPerspectiveCamera implements AglCamera {
         return projMatrix;
     }
 
-    protected Vec3 getEye() {
+    public Vec3 getEye() {
         return eye;
     }
 
-    protected Vec3 getCenter() {
+    public Vec3 getCenter() {
         return center;
     }
 
-    protected Vec3 getUp() {
+    public Vec3 getUp() {
         return up;
     }
 }

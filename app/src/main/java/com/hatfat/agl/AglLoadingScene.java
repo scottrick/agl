@@ -23,18 +23,10 @@ public class AglLoadingScene extends AglScene {
     @Inject AglRandom random;
 
     public AglLoadingScene(Context context) {
-        super(context);
+        super(context, true);
 
         AglApplication app = AglApplication.get(context);
         app.inject(this);
-
-        AglCamera camera = new AglPerspectiveCamera(
-                new Vec3(0.0f, 0.0f, 6.0f),
-                new Vec3(0.0f, 0.0f, 0.0f),
-                new Vec3(0.0f, 1.0f, 0.0f),
-                60.0f, 1.0f, 0.1f, 100.0f);
-
-        setCamera(camera);
     }
 
     @Override protected void setupSceneGLWork(AglRenderer renderer) {

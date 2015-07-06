@@ -1,10 +1,10 @@
-package com.hatfat.agl;
+package com.hatfat.agl.component.camera;
 
 import android.opengl.Matrix;
 
 import com.hatfat.agl.util.Vec3;
 
-public class AglOrthographicCamera implements AglCamera {
+public class OrthographicCameraComponent extends CameraComponent {
 
     private Vec3 eye;
     private Vec3 center;
@@ -20,9 +20,11 @@ public class AglOrthographicCamera implements AglCamera {
     private float near;
     private float far;
 
-    public AglOrthographicCamera(Vec3 eye, Vec3 center, Vec3 up,
+    public OrthographicCameraComponent(Vec3 eye, Vec3 center, Vec3 up,
                                  float width,
                                  float near, float far) {
+        super();
+
         this.eye = eye;
         this.center = center;
         this.up = up;
@@ -74,15 +76,15 @@ public class AglOrthographicCamera implements AglCamera {
         return top - bottom;
     }
 
-    protected Vec3 getEye() {
+    public Vec3 getEye() {
         return eye;
     }
 
-    protected Vec3 getCenter() {
+    public Vec3 getCenter() {
         return center;
     }
 
-    protected Vec3 getUp() {
+    public Vec3 getUp() {
         return up;
     }
 

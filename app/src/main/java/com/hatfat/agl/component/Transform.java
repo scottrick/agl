@@ -1,5 +1,6 @@
 package com.hatfat.agl.component;
 
+import com.hatfat.agl.AglScene;
 import com.hatfat.agl.util.Matrix;
 import com.hatfat.agl.util.PosQuat;
 import com.hatfat.agl.util.Quat;
@@ -37,11 +38,11 @@ public class Transform extends AglComponent {
     }
 
     //will set the model matrix to the passed in matrix
-    public void getModelMatrix(Matrix matrix) {
+    public void getModelMatrix(AglScene scene, Matrix matrix) {
         if (scaleMatrix != null) {
             //need to apply scaling, do some extra work
             posQuat.quat.toMatrix(matrix);
-            Matrix newMatrix = Matrix.multiplyBy(matrix, scaleMatrix);
+            Matrix newMatrix = Matrix.multiplyBy(scaleMatrix, matrix);
             newMatrix.translate(posQuat.pos);
             matrix.set(newMatrix);
         }
@@ -52,7 +53,7 @@ public class Transform extends AglComponent {
         }
     }
 
-    public Vec3 getAbsolutePos() {
+    public Vec3 getAbsolutePos(AglScene scene) {
         return posQuat.pos;
     }
 }

@@ -1,6 +1,6 @@
 package com.hatfat.agl.component;
 
-import com.hatfat.agl.entity.AglEntity;
+import com.hatfat.agl.AglScene;
 import com.hatfat.agl.util.Matrix;
 import com.hatfat.agl.util.PosQuat;
 import com.hatfat.agl.util.Quat;
@@ -8,10 +8,10 @@ import com.hatfat.agl.util.Vec3;
 
 public class OffsetTransform extends Transform {
 
-    private final AglEntity offsetEntity;
+    private final int offsetEntityId;
 
-    public OffsetTransform(AglEntity offsetEntity) {
-        this.offsetEntity = offsetEntity;
+    public OffsetTransform(int offsetEntityId) {
+        this.offsetEntityId = offsetEntityId;
         this.posQuat = new PosQuat(new Vec3(1.0f, 1.0f, 1.0f), new Quat());
     }
 
@@ -28,16 +28,16 @@ public class OffsetTransform extends Transform {
     }
 
     //will set the model matrix to the passed in matrix
-    public void getModelMatrix(Matrix matrix) {
+    public void getModelMatrix(AglScene scene, Matrix matrix) {
         Matrix offsetMatrix = new Matrix();
 
-        Transform transform = offsetEntity.getComponentByType(ComponentType.TRANSFORM);
-        transform.getModelMatrix(matrix);
+        Transform transform = scene.getEntityById(offsetEntityId).getComponentByType(ComponentType.TRANSFORM);
+        transform.getModelMatrix(scene, matrix);
 
         if (scaleMatrix != null) {
             //need to apply scaling, do some extra work
             posQuat.quat.toMatrix(offsetMatrix);
-            Matrix newMatrix = Matrix.multiplyBy(offsetMatrix, scaleMatrix);
+            Matrix newMatrix = Matrix.multiplyBy(scaleMatrix, offsetMatrix);
             newMatrix.translate(posQuat.pos);
             offsetMatrix.set(newMatrix);
         }
@@ -50,9 +50,9 @@ public class OffsetTransform extends Transform {
         matrix.set(Matrix.multiplyBy(offsetMatrix, matrix));
     }
 
-    @Override public Vec3 getAbsolutePos() {
+    @Override public Vec3 getAbsolutePos(AglScene scene) {
         Matrix matrix = new Matrix();
-        getModelMatrix(matrix);
+        getModelMatrix(scene, matrix);
         return matrix.getPositionOffset();
     }
 }
