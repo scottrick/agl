@@ -1,5 +1,7 @@
 Agl TODO
 ---------------------------
+touch detection is a little off
+
 Implement ECS (Entity Component System) in Agl
 	What components will we have?
 		Graphics, Transform, Physics, Audio, Input, StateSaving, Particles

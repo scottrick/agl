@@ -88,8 +88,7 @@ public class AglScene {
                 new Vec3(0.0f, 1.0f, 0.0f),
                 60.0f, 1.0f, 0.1f, 1000.0f));
 
-        addEntity(cameraEntity);
-        cameraSystem.setActiveCameraEntity(cameraEntity);
+        addCameraEntity(cameraEntity);
     }
 
     public final void setupSceneBackground() {
@@ -288,31 +287,38 @@ public class AglScene {
 
             List<AglEntity> currentEntities = renderableHashMap.get(currentRenderable);
             for (AglEntity entity : currentEntities) {
-                RenderableComponent renderableComponent = entity.getComponentByType(ComponentType.RENDERABLE);
+                List<RenderableComponent> renderableComponents = entity.getComponentsByType(
+                        ComponentType.RENDERABLE);
                 Transform transform = entity.getComponentByType(ComponentType.TRANSFORM);
 
-                if (renderableComponent == null || transform == null) {
-                    //entity doesn't have required components to render
-                    continue;
+                for (RenderableComponent renderableComponent : renderableComponents) {
+                    if (!renderableComponent.getRenderable().equals(currentRenderable)) {
+                        continue;
+                    }
+
+                    if (renderableComponent == null || transform == null) {
+                        //entity doesn't have required components to render
+                        continue;
+                    }
+
+                    if (!renderableComponent.shouldRender()) {
+                        continue;
+                    }
+
+                    Vec3 lightTransformAbsPos = lightTransform.getAbsolutePos(this);
+                    Vec3 transformAbsPos = transform.getAbsolutePos(this);
+
+                    GLES20.glUniform3f(lightDirUniformLocation,
+                            lightTransformAbsPos.x - transformAbsPos.x,
+                            lightTransformAbsPos.y - transformAbsPos.y,
+                            lightTransformAbsPos.z - transformAbsPos.z);
+
+                    //render each entity of this renderable type
+                    transform.getModelMatrix(this, modelMatrix);
+                    GLES20.glUniformMatrix4fv(modelUniformLocation, 1, false, modelMatrix.m, 0);
+
+                    currentRenderable.render();
                 }
-
-                if (!renderableComponent.shouldRender()) {
-                    continue;
-                }
-
-                Vec3 lightTransformAbsPos = lightTransform.getAbsolutePos(this);
-                Vec3 transformAbsPos = transform.getAbsolutePos(this);
-
-                GLES20.glUniform3f(lightDirUniformLocation,
-                        lightTransformAbsPos.x - transformAbsPos.x,
-                        lightTransformAbsPos.y - transformAbsPos.y,
-                        lightTransformAbsPos.z - transformAbsPos.z);
-
-                //render each entity of this renderable type
-                transform.getModelMatrix(this, modelMatrix);
-                GLES20.glUniformMatrix4fv(modelUniformLocation, 1, false, modelMatrix.m, 0);
-
-                currentRenderable.render();
             }
 
             currentRenderable.cleanupRender();
@@ -336,6 +342,11 @@ public class AglScene {
 
     public boolean isReadyToRender() {
         return getSceneState() == SceneState.READY_FOR_RENDER;
+    }
+
+    public void addCameraEntity(AglEntity cameraEntity) {
+        addEntity(cameraEntity);
+        cameraSystem.setActiveCameraEntity(cameraEntity);
     }
 
     public CameraComponent getCamera() {
