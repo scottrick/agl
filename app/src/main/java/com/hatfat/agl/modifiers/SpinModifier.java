@@ -1,6 +1,6 @@
 package com.hatfat.agl.modifiers;
 
-import com.hatfat.agl.component.Transform;
+import com.hatfat.agl.component.transform.Transform;
 import com.hatfat.agl.util.Quat;
 import com.hatfat.agl.util.Vec3;
 

@@ -1,6 +1,7 @@
-package com.hatfat.agl.component;
+package com.hatfat.agl.component.transform;
 
 import com.hatfat.agl.AglScene;
+import com.hatfat.agl.component.ComponentType;
 import com.hatfat.agl.util.Matrix;
 import com.hatfat.agl.util.PosQuat;
 import com.hatfat.agl.util.Quat;
@@ -47,7 +48,17 @@ public class OffsetTransform extends Transform {
             offsetMatrix.translate(posQuat.pos);
         }
 
-        matrix.set(Matrix.multiplyBy(offsetMatrix, matrix));
+        Matrix result = Matrix.multiplyBy(offsetMatrix, matrix);
+
+        if (isBillboard) {
+            Vec3 absPos = result.getPositionOffset();
+            matrix.setIdentity();
+            matrix.setScale(scale);
+            matrix.translate(absPos);
+        }
+        else {
+            matrix.set(result);
+        }
     }
 
     @Override public Vec3 getAbsolutePos(AglScene scene) {

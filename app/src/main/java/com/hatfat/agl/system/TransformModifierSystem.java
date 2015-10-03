@@ -2,7 +2,7 @@ package com.hatfat.agl.system;
 
 import com.hatfat.agl.component.ComponentType;
 import com.hatfat.agl.component.ModifierComponent;
-import com.hatfat.agl.component.Transform;
+import com.hatfat.agl.component.transform.Transform;
 import com.hatfat.agl.entity.AglEntity;
 
 import java.util.Arrays;

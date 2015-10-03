@@ -6,7 +6,7 @@ import com.hatfat.agl.app.AglApplication;
 import com.hatfat.agl.app.AglRenderer;
 import com.hatfat.agl.component.ModifierComponent;
 import com.hatfat.agl.component.RenderableComponent;
-import com.hatfat.agl.component.Transform;
+import com.hatfat.agl.component.transform.Transform;
 import com.hatfat.agl.entity.AglEntity;
 import com.hatfat.agl.mesh.TestRenderableFactory;
 import com.hatfat.agl.modifiers.SpinModifier;

@@ -160,6 +160,26 @@ public class TestRenderableFactory {
         return texturedCube;
     }
 
+    public static AglTexturedGeometry createTextureSquare(AglTexture texture) {
+        float vertices[] = {
+                //vertex (x, y, z), texture (s, t), normal(x, y, z)
+                //FRONT
+                -0.5f,  0.5f,  0.5f,        0f,  1f,        0f,  0f,  1f,   //1
+                 0.5f,  0.5f,  0.5f,        1f,  1f,        0f,  0f,  1f,   //2
+                 0.5f, -0.5f,  0.5f,        1f,  0f,        0f,  0f,  1f,   //3
+                -0.5f, -0.5f,  0.5f,        0f,  0f,        0f,  0f,  1f,   //4
+        };
+
+        int elements[] = {
+                0, 2, 1, //front
+                0, 3, 2,
+        };
+
+        AglTexturedGeometry texturedGeometry = new AglTexturedGeometry(vertices, 4, elements, elements.length, texture, false);
+
+        return texturedGeometry;
+    }
+
     public static AglBumpMappedGeometry createNormalMappedTextureCube(AglTexture texture, AglTexture normalTexture, AglTexture specularTexture) {
 
         float vertices[] = {

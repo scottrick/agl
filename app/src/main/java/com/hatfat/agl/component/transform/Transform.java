@@ -1,6 +1,8 @@
-package com.hatfat.agl.component;
+package com.hatfat.agl.component.transform;
 
 import com.hatfat.agl.AglScene;
+import com.hatfat.agl.component.AglComponent;
+import com.hatfat.agl.component.ComponentType;
 import com.hatfat.agl.util.Matrix;
 import com.hatfat.agl.util.PosQuat;
 import com.hatfat.agl.util.Quat;
@@ -9,6 +11,8 @@ import com.hatfat.agl.util.Vec3;
 public class Transform extends AglComponent {
 
     public PosQuat posQuat;
+
+    public boolean isBillboard;
 
     protected Vec3   scale;
     protected Matrix scaleMatrix;

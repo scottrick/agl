@@ -1,5 +1,6 @@
 package com.hatfat.agl.component;
 
+import com.hatfat.agl.component.transform.Transform;
 import com.hatfat.agl.modifiers.Modifier;
 
 public class ModifierComponent extends AglComponent {

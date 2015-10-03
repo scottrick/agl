@@ -9,7 +9,7 @@ import com.hatfat.agl.app.AglRenderer;
 import com.hatfat.agl.component.ComponentType;
 import com.hatfat.agl.component.LightComponent;
 import com.hatfat.agl.component.RenderableComponent;
-import com.hatfat.agl.component.Transform;
+import com.hatfat.agl.component.transform.Transform;
 import com.hatfat.agl.component.camera.CameraComponent;
 import com.hatfat.agl.component.camera.PerspectiveCameraComponent;
 import com.hatfat.agl.entity.AglEntity;
