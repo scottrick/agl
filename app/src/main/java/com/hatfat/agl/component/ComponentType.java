@@ -4,6 +4,7 @@ public enum ComponentType {
 
     RENDERABLE,
     TRANSFORM,
+    MOVEMENT,
     PHYSICS,
     AUDIO,
     INPUT,

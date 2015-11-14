@@ -3,6 +3,7 @@ package com.hatfat.agl.textures;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.util.Log;
@@ -40,8 +41,14 @@ public class AglTexture {
         int textureResourceId = context.getResources().getIdentifier(filename, "drawable",
                 context.getPackageName());
 
-        final Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(),
+        final Bitmap sourceBitmap = BitmapFactory.decodeResource(context.getResources(),
                 textureResourceId, options);
+
+        /* need to flip the bitmap vertically so it matches how opengl handles texture coordinates */
+        Matrix flip = new Matrix();
+        flip.postScale(1f, -1f);
+        final Bitmap rotatedBitmap = Bitmap.createBitmap(sourceBitmap, 0, 0, sourceBitmap.getWidth(),
+                sourceBitmap.getHeight(), flip, true);
 
         //bind the texture
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, getTexture());
@@ -51,13 +58,14 @@ public class AglTexture {
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
 
         //load the bitmap into the bound texture.
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, rotatedBitmap, 0);
 
         //generate mipmaps
         GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
 
         //and clean up
-        bitmap.recycle();
+        sourceBitmap.recycle();
+        rotatedBitmap.recycle();
     }
 
     public int getTexture() {

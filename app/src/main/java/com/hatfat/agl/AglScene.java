@@ -9,14 +9,13 @@ import com.hatfat.agl.app.AglRenderer;
 import com.hatfat.agl.component.ComponentType;
 import com.hatfat.agl.component.LightComponent;
 import com.hatfat.agl.component.RenderableComponent;
-import com.hatfat.agl.component.transform.Transform;
 import com.hatfat.agl.component.camera.CameraComponent;
 import com.hatfat.agl.component.camera.PerspectiveCameraComponent;
+import com.hatfat.agl.component.transform.Transform;
 import com.hatfat.agl.entity.AglEntity;
 import com.hatfat.agl.render.AglRenderable;
 import com.hatfat.agl.system.AglSystem;
 import com.hatfat.agl.system.CameraSystem;
-import com.hatfat.agl.system.TransformModifierSystem;
 import com.hatfat.agl.util.Matrix;
 import com.hatfat.agl.util.Vec3;
 
@@ -63,7 +62,7 @@ public class AglScene {
     public AglScene(Context context, boolean shouldAddDefaultCamera) {
         this.context = context;
 
-        systems.add(new TransformModifierSystem());
+        /* only the camera system is added by default */
         systems.add(cameraSystem = new CameraSystem());
 
         entities = new AglEntity[maxNumEntities];

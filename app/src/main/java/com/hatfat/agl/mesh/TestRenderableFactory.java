@@ -2,6 +2,7 @@ package com.hatfat.agl.mesh;
 
 import com.hatfat.agl.render.AglBumpMappedGeometry;
 import com.hatfat.agl.render.AglColoredGeometry;
+import com.hatfat.agl.render.AglLineSegments;
 import com.hatfat.agl.render.AglTexturedGeometry;
 import com.hatfat.agl.render.AglWireframe;
 import com.hatfat.agl.textures.AglTexture;
@@ -93,6 +94,30 @@ public class TestRenderableFactory {
         return wireframe;
     }
 
+    public static AglLineSegments createOrigin() {
+        final float vertices[] = {
+                //vertex (x, y, z),             color (r, g, b, a),
+                0.0f, 0.0f, 0.0f,               1.0f, 0.2f, 0.2f, 1.0f,     // X-Axis  RED
+                5.0f, 0.0f, 0.0f,               1.0f, 0.2f, 0.2f, 1.0f,
+
+                0.0f, 0.0f, 0.0f,               0.2f, 1.0f, 0.2f, 1.0f,     // Y-Axis  GREEN
+                0.0f, 5.0f, 0.0f,               0.2f, 1.0f, 0.2f, 1.0f,
+
+                0.0f, 0.0f, 0.0f,               0.2f, 0.2f, 1.0f, 1.0f,     // Z-Axis  BLUE
+                0.0f, 0.0f, 5.0f,               0.2f, 0.2f, 1.0f, 1.0f,
+        };
+
+        final int elements[] = {
+                0, 1,
+                2, 3,
+                4, 5,
+        };
+
+        AglLineSegments lineSegments = new AglLineSegments(vertices, 6, elements, elements.length);
+
+        return lineSegments;
+    }
+
     public static AglTexturedGeometry createTextureCube(AglTextureManager textureManager, boolean isLit) {
 
         float vertices[] = {
@@ -164,10 +189,10 @@ public class TestRenderableFactory {
         float vertices[] = {
                 //vertex (x, y, z), texture (s, t), normal(x, y, z)
                 //FRONT
-                -0.5f,  0.5f,  0.5f,        0f,  1f,        0f,  0f,  1f,   //1
-                 0.5f,  0.5f,  0.5f,        1f,  1f,        0f,  0f,  1f,   //2
-                 0.5f, -0.5f,  0.5f,        1f,  0f,        0f,  0f,  1f,   //3
-                -0.5f, -0.5f,  0.5f,        0f,  0f,        0f,  0f,  1f,   //4
+                -0.5f,  0.5f,  0.0f,        0f,  1f,        0f,  0f,  1f,   //1
+                 0.5f,  0.5f,  0.0f,        1f,  1f,        0f,  0f,  1f,   //2
+                 0.5f, -0.5f,  0.0f,        1f,  0f,        0f,  0f,  1f,   //3
+                -0.5f, -0.5f,  0.0f,        0f,  0f,        0f,  0f,  1f,   //4
         };
 
         int elements[] = {

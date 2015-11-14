@@ -1,6 +1,7 @@
 Agl TODO
 ---------------------------
-touch detection is a little off
+FIX fullscreen issue when launching fresh app from shortcut; the bottom part of the screen where the controls normally go, is cut off...
+		-> only in portrait????? (on hex quest?)
 
 Implement ECS (Entity Component System) in Agl
 	What components will we have?
