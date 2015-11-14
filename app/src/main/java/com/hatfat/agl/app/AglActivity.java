@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import com.hatfat.agl.AglScene;
+import com.hatfat.agl.base.AglScene;
 import com.hatfat.agl.R;
 import com.hatfat.agl.events.AglFpsUpdatedEvent;
 import com.squareup.otto.Bus;

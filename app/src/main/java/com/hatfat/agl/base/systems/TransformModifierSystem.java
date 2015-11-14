@@ -1,5 +1,7 @@
-package com.hatfat.agl.system;
+package com.hatfat.agl.base.systems;
 
+import com.hatfat.agl.app.AglRenderer;
+import com.hatfat.agl.base.AglSystem;
 import com.hatfat.agl.component.ComponentType;
 import com.hatfat.agl.component.ModifierComponent;
 import com.hatfat.agl.component.transform.Transform;
@@ -13,7 +15,13 @@ public class TransformModifierSystem extends AglSystem {
         super(Arrays.asList(ComponentType.MODIFIER, ComponentType.TRANSFORM));
     }
 
-    @Override void updateEntity(AglEntity entity, float deltaTime) {
+    @Override
+    public void prepareRenderables(AglRenderer renderer) {
+
+    }
+
+    @Override
+    public void updateEntity(AglEntity entity, float deltaTime) {
         Transform transform = entity.getComponentByType(ComponentType.TRANSFORM);
         ModifierComponent modifierComponent = entity.getComponentByType(ComponentType.MODIFIER);
         modifierComponent.update(deltaTime, transform);

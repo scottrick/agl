@@ -11,6 +11,7 @@ import com.hatfat.agl.entity.AglEntity;
 import com.hatfat.agl.mesh.TestRenderableFactory;
 import com.hatfat.agl.modifiers.SpinModifier;
 import com.hatfat.agl.render.AglRenderable;
+import com.hatfat.agl.base.AglScene;
 import com.hatfat.agl.util.AglRandom;
 import com.hatfat.agl.util.Vec3;
 

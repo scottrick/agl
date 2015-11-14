@@ -4,7 +4,7 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 
-import com.hatfat.agl.AglScene;
+import com.hatfat.agl.base.AglScene;
 
 /**
  * Created by scottrick on 7/31/14.

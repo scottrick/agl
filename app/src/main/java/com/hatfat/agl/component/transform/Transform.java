@@ -1,6 +1,6 @@
 package com.hatfat.agl.component.transform;
 
-import com.hatfat.agl.AglScene;
+import com.hatfat.agl.base.AglScene;
 import com.hatfat.agl.component.AglComponent;
 import com.hatfat.agl.component.ComponentType;
 import com.hatfat.agl.util.Matrix;

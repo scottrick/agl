@@ -105,11 +105,11 @@ public class AglEntity {
     }
 
     /**
-     * Returns the first component of the given type.
+     * Returns the first component of the given typeId.
      *
-     * @param type type of component to retrieve.
+     * @param type typeId of component to retrieve.
      * @param <T>
-     * @return The first component of the given type we found; null if there are none.
+     * @return The first component of the given typeId we found; null if there are none.
      */
     @SuppressWarnings("unchecked")
     public <T extends AglComponent> T getComponentByType(ComponentType type) {
@@ -123,9 +123,9 @@ public class AglEntity {
     }
 
     /**
-     * Returns all of the components of the given type.
+     * Returns all of the components of the given typeId.
      *
-     * @param type type of the components to retrieve.
+     * @param type typeId of the components to retrieve.
      * @param <T>
      * @return The list of components that were found.  Empty list if there were none.
      */

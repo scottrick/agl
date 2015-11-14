@@ -7,7 +7,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.hatfat.agl.AglLoadingScene;
-import com.hatfat.agl.AglScene;
+import com.hatfat.agl.base.AglScene;
 import com.hatfat.agl.events.AglFpsUpdatedEvent;
 import com.hatfat.agl.shaders.AglShaderManager;
 import com.hatfat.agl.textures.AglTextureManager;
@@ -17,9 +17,6 @@ import javax.inject.Inject;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-/**
- * Created by scottrick on 7/31/14.
- */
 public class AglRenderer implements GLSurfaceView.Renderer {
 
     @Inject

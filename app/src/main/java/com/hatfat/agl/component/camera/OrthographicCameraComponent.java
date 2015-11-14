@@ -20,9 +20,10 @@ public class OrthographicCameraComponent extends CameraComponent {
     private float near;
     private float far;
 
-    public OrthographicCameraComponent(Vec3 eye, Vec3 center, Vec3 up,
-                                 float width,
-                                 float near, float far) {
+    public OrthographicCameraComponent(
+            Vec3 eye, Vec3 center, Vec3 up,
+            float width, float near, float far) {
+
         super();
 
         this.eye = eye;
@@ -57,7 +58,8 @@ public class OrthographicCameraComponent extends CameraComponent {
     @Override
     public float[] getViewMatrix() {
         float viewMatrix[] = new float[16];
-        Matrix.setLookAtM(viewMatrix, 0, eye.x, eye.y, eye.z, center.x, center.y, center.z, up.x, up.y, up.z);
+        Matrix.setLookAtM(viewMatrix, 0, eye.x, eye.y, eye.z, center.x, center.y, center.z, up.x,
+                up.y, up.z);
         return viewMatrix;
     }
 
@@ -68,11 +70,11 @@ public class OrthographicCameraComponent extends CameraComponent {
         return projMatrix;
     }
 
-    protected float getWidth() {
+    public float getWidth() {
         return width;
     }
 
-    protected float getHeight() {
+    public float getHeight() {
         return top - bottom;
     }
 

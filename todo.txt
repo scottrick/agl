@@ -17,7 +17,6 @@ Entity
 	List<Component> components 		//list of components
 
 Component
-	bitflag with base component type
 	Component specific data
 
 System

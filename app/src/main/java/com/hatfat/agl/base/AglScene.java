@@ -1,4 +1,4 @@
-package com.hatfat.agl;
+package com.hatfat.agl.base;
 
 import android.content.Context;
 import android.opengl.GLES20;
@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.hatfat.agl.app.AglRenderer;
+import com.hatfat.agl.base.systems.CameraSystem;
 import com.hatfat.agl.component.ComponentType;
 import com.hatfat.agl.component.LightComponent;
 import com.hatfat.agl.component.RenderableComponent;
@@ -14,8 +15,6 @@ import com.hatfat.agl.component.camera.PerspectiveCameraComponent;
 import com.hatfat.agl.component.transform.Transform;
 import com.hatfat.agl.entity.AglEntity;
 import com.hatfat.agl.render.AglRenderable;
-import com.hatfat.agl.system.AglSystem;
-import com.hatfat.agl.system.CameraSystem;
 import com.hatfat.agl.util.Matrix;
 import com.hatfat.agl.util.Vec3;
 
@@ -63,7 +62,7 @@ public class AglScene {
         this.context = context;
 
         /* only the camera system is added by default */
-        systems.add(cameraSystem = new CameraSystem());
+        addSystem(cameraSystem = new CameraSystem());
 
         entities = new AglEntity[maxNumEntities];
         renderableHashMap = new HashMap<>();
@@ -121,6 +120,11 @@ public class AglScene {
 
         setupSceneGLWork(renderer);
 
+        /* prepare all the systems */
+        for (AglSystem system : systems) {
+            system.prepareRenderables(renderer);
+        }
+
         long setupEndTime = java.lang.System.currentTimeMillis();
         Log.i("AglScene", AglScene.this.getClass().getSimpleName() + " GL setup took " + (setupEndTime - setupStartTime) + " milliseconds.");
 
@@ -136,6 +140,11 @@ public class AglScene {
 
         //update the scene state;
         sceneState = SceneState.NOT_SETUP;
+    }
+
+    protected void addSystem(AglSystem system) {
+        system.setScene(this);
+        systems.add(system);
     }
 
     public void addEntities(List<AglEntity> entities) {
@@ -229,7 +238,7 @@ public class AglScene {
             renderableEntityList.remove(entity);
 
             if (renderableEntityList.size() <= 0) {
-                //no entities with this type of renderable left, so we can remove this list
+                //no entities with this typeId of renderable left, so we can remove this list
                 renderableHashMap.remove(renderableComponent.getRenderable());
             }
         }
@@ -312,7 +321,7 @@ public class AglScene {
                             lightTransformAbsPos.y - transformAbsPos.y,
                             lightTransformAbsPos.z - transformAbsPos.z);
 
-                    //render each entity of this renderable type
+                    //render each entity of this renderable typeId
                     transform.getModelMatrix(this, modelMatrix);
                     GLES20.glUniformMatrix4fv(modelUniformLocation, 1, false, modelMatrix.m, 0);
 
@@ -335,7 +344,7 @@ public class AglScene {
         }
 
         for (AglSystem system : systems) {
-            system.updateSystem(this, deltaTime);
+            system.updateSystem(deltaTime);
         }
     }
 

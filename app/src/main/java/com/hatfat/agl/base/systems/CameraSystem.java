@@ -1,5 +1,7 @@
-package com.hatfat.agl.system;
+package com.hatfat.agl.base.systems;
 
+import com.hatfat.agl.app.AglRenderer;
+import com.hatfat.agl.base.AglSystem;
 import com.hatfat.agl.component.ComponentType;
 import com.hatfat.agl.component.camera.CameraComponent;
 import com.hatfat.agl.entity.AglEntity;
@@ -15,7 +17,12 @@ public class CameraSystem extends AglSystem {
     }
 
     @Override
-    void updateEntity(AglEntity entity, float deltaTime) {
+    public void prepareRenderables(AglRenderer renderer) {
+
+    }
+
+    @Override
+    public void updateEntity(AglEntity entity, float deltaTime) {
 //        entity.getComponentsByType(ComponentType.CAMERA)
     }
 

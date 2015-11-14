@@ -1,5 +1,7 @@
-package com.hatfat.agl.system;
+package com.hatfat.agl.base.systems;
 
+import com.hatfat.agl.app.AglRenderer;
+import com.hatfat.agl.base.AglSystem;
 import com.hatfat.agl.component.ComponentType;
 import com.hatfat.agl.component.MovementComponent;
 import com.hatfat.agl.component.transform.Transform;
@@ -16,7 +18,13 @@ public class MovementSystem extends AglSystem {
         super(Arrays.asList(ComponentType.MOVEMENT, ComponentType.TRANSFORM));
     }
 
-    @Override void updateEntity(AglEntity entity, float deltaTime) {
+    @Override
+    public void prepareRenderables(AglRenderer renderer) {
+
+    }
+
+    @Override
+    public void updateEntity(AglEntity entity, float deltaTime) {
         Transform transform = entity.getComponentByType(ComponentType.TRANSFORM);
         MovementComponent movement = entity.getComponentByType(ComponentType.MOVEMENT);
 
