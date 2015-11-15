@@ -56,6 +56,11 @@ public class AglScene {
     protected boolean isPaused;
     private SceneState sceneState = SceneState.NOT_SETUP;
 
+    /* flag for debug output */
+    private boolean debugEnabled;
+    private float debugTime = 0.0f;
+    private float debugPrintInterval = 5.0f;
+
     private Context context;
 
     public AglScene(Context context, boolean shouldAddDefaultCamera) {
@@ -343,8 +348,19 @@ public class AglScene {
             deltaTime = 0.0f;
         }
 
+        if (debugEnabled) {
+            debugTime += deltaTime;
+
+            if (debugTime > debugPrintInterval) {
+                debugTime -= debugPrintInterval;
+                Log.i(getClass().getSimpleName(), getNumEntities() + " entities.");
+            }
+        }
+
         for (AglSystem system : systems) {
-            system.updateSystem(deltaTime);
+            if (system.isEnabled()) {
+                system.updateSystem(deltaTime);
+            }
         }
     }
 
@@ -371,6 +387,14 @@ public class AglScene {
 
     public SceneState getSceneState() {
         return sceneState;
+    }
+
+    protected final boolean isDebugEnabled() {
+        return debugEnabled;
+    }
+
+    protected final void setDebugEnabled(boolean debugEnabled) {
+        this.debugEnabled = debugEnabled;
     }
 
     public boolean isPaused() {

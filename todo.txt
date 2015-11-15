@@ -1,5 +1,9 @@
 Agl TODO
 ---------------------------
+work on smoothness of animation 
+	vsync?
+	http://stackoverflow.com/questions/25107428/double-buffer-page-flipping-in-android-using-opengl-es-2-0
+
 FIX fullscreen issue when launching fresh app from shortcut; the bottom part of the screen where the controls normally go, is cut off...
 		-> only in portrait????? (on hex quest?)
 

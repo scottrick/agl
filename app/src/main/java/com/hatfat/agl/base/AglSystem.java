@@ -14,6 +14,9 @@ public abstract class AglSystem {
     /* the ComponentTypes this system operates on */
     private final List<ComponentType> types;
 
+    /* if this System is enabled */
+    private boolean enabled = true;
+
     public AglSystem(List<ComponentType> types) {
         this.types = types;
     }
@@ -45,6 +48,14 @@ public abstract class AglSystem {
 
     final void setScene(AglScene scene) {
         this.scene = scene;
+    }
+
+    public final boolean isEnabled() {
+        return enabled;
+    }
+
+    public final void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     /* create any OpenGL renderables here for use later */
