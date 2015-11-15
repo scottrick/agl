@@ -6,26 +6,25 @@ import com.hatfat.agl.render.AglLineSegments;
 import com.hatfat.agl.render.AglTexturedGeometry;
 import com.hatfat.agl.render.AglWireframe;
 import com.hatfat.agl.textures.AglTexture;
-import com.hatfat.agl.textures.AglTextureManager;
 
 public class TestRenderableFactory {
 
     public final static float icosahedronVerticesWithColorsAndNormals[] = {
         //vertex (x, y, z), color (r, g, b, a),    normal (x, y, z)
-        0f,  -0.525731f,  0.850651f,        1f,  0f,  0f,  1f,     0f,  -0.525731f,  0.850651f,
-        0.850651f,  0f,  0.525731f,        0f,  1f,  0f,  1f,      0.850651f,  0f,  0.525731f,
-        0.850651f,  0f,  -0.525731f,        0f,  0f,  1f,  1f,      0.850651f, 0f,  -0.525731f,
-        -0.850651f,  0f,  -0.525731f,        1f,  1f,  0f,  1f,     -0.850651f,  0f,  -0.525731f,
+        0f,  -0.525731f,  0.850651f,        0.1f,  0.9f,  0.1f,  1f,     0f,  -0.525731f,  0.850651f,
+        0.850651f,  0f,  0.525731f,        0.1f,  0.9f,  0.1f,  1f,      0.850651f,  0f,  0.525731f,
+        0.850651f,  0f,  -0.525731f,        0.1f,  0.9f,  0.1f,  1f,      0.850651f, 0f,  -0.525731f,
+        -0.850651f,  0f,  -0.525731f,        0.1f,  0.9f,  0.1f,  1f,     -0.850651f,  0f,  -0.525731f,
 
-        -0.850651f,  0f,  0.525731f,        1f,  0f,  1f,  1f,     -0.850651f,  0f,  0.525731f,
-        -0.525731f,  0.850651f,  0f,        0f,  1f,  1f,  1f,      -0.525731f,  0.850651f,  0f,
-        0.525731f,  0.850651f,  0f,        1f, .5f,  0f,  1f,      0.525731f,  0.850651f,  0f,
-        0.525731f,  -0.850651f,  0f,        0f, .5f,  1f,  1f,     0.525731f,  -0.850651f,  0f,
+        -0.850651f,  0f,  0.525731f,        0.1f,  0.9f,  0.1f,  1f,     -0.850651f,  0f,  0.525731f,
+        -0.525731f,  0.850651f,  0f,        0.1f,  0.9f,  0.1f,  1f,      -0.525731f,  0.850651f,  0f,
+        0.525731f,  0.850651f,  0f,        0.1f,  0.9f,  0.1f,  1f,      0.525731f,  0.850651f,  0f,
+        0.525731f,  -0.850651f,  0f,        0.1f,  0.9f,  0.1f,  1f,     0.525731f,  -0.850651f,  0f,
 
-        -0.525731f,  -0.850651f,  0f,        1f,  0f,  0f,  1f,     -0.525731f,  -0.850651f,  0f,
-        0f,  -0.525731f,  -0.850651f,        0f,  1f,  0f,  1f,      0f,  -0.525731f,  -0.850651f,
-        0f,  0.525731f,  -0.850651f,        0f,  0f,  1f,  1f,      0f,  0.525731f,  -0.850651f,
-        0f,  0.525731f,  0.850651f,        1f,  1f,  0f,  1f,     0f,  0.525731f,  0.850651f,
+        -0.525731f,  -0.850651f,  0f,        0.1f,  0.9f,  0.1f,  1f,     -0.525731f,  -0.850651f,  0f,
+        0f,  -0.525731f,  -0.850651f,        0.1f,  0.9f,  0.1f,  1f,      0f,  -0.525731f,  -0.850651f,
+        0f,  0.525731f,  -0.850651f,        0.1f,  0.9f,  0.1f,  1f,      0f,  0.525731f,  -0.850651f,
+        0f,  0.525731f,  0.850651f,        0.1f,  0.9f,  0.1f,  1f,     0f,  0.525731f,  0.850651f,
     };
 
     public final static float icosahedronVertices[] = {
@@ -118,7 +117,7 @@ public class TestRenderableFactory {
         return lineSegments;
     }
 
-    public static AglTexturedGeometry createTextureCube(AglTextureManager textureManager, boolean isLit) {
+    public static AglTexturedGeometry createTextureCube(AglTexture texture, boolean isLit) {
 
         float vertices[] = {
                 //vertex (x, y, z), texture (s, t),    normal (x, y, z)
@@ -180,7 +179,7 @@ public class TestRenderableFactory {
                 20, 22, 23,
         };
 
-        AglTexturedGeometry texturedCube = new AglTexturedGeometry(vertices, 24, elements, elements.length, textureManager.getDefaultTexture(), isLit);
+        AglTexturedGeometry texturedCube = new AglTexturedGeometry(vertices, 24, elements, elements.length, texture, isLit);
 
         return texturedCube;
     }

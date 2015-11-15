@@ -152,6 +152,11 @@ public class AglScene {
         systems.add(system);
     }
 
+    public void updateEntity(AglEntity entity) {
+        removeEntity(entity);
+        addEntity(entity);
+    }
+
     public void addEntities(List<AglEntity> entities) {
         for (AglEntity entity : entities) {
             addEntity(entity);
@@ -237,7 +242,8 @@ public class AglScene {
                     .get(renderableComponent.getRenderable());
 
             if (renderableEntityList == null) {
-                throw new RuntimeException("shouldn't ever happen...");
+                /* has a renderable component that was added after this entity was added to the scene */
+                continue;
             }
 
             renderableEntityList.remove(entity);
@@ -270,7 +276,7 @@ public class AglScene {
         int projectionUniformLocation = 0;
         int viewUniformLocation = 0;
         int modelUniformLocation = 0;
-        int lightDirUniformLocation = 0;
+        int lightPosUniformLocation = 0;
         int lightColorUniformLocation = 0;
 
         for (AglRenderable currentRenderable : renderableHashMap.keySet()) {
@@ -285,7 +291,7 @@ public class AglScene {
                 projectionUniformLocation = GLES20.glGetUniformLocation(activeProgram, "proj");
                 viewUniformLocation = GLES20.glGetUniformLocation(activeProgram, "view");
                 modelUniformLocation = GLES20.glGetUniformLocation(activeProgram, "model");
-                lightDirUniformLocation = GLES20.glGetUniformLocation(activeProgram, "lightDir");
+                lightPosUniformLocation = GLES20.glGetUniformLocation(activeProgram, "lightPos");
                 lightColorUniformLocation = GLES20.glGetUniformLocation(activeProgram, "lightColor");
 
                 viewMatrix = getCamera().getViewMatrix();
@@ -321,7 +327,7 @@ public class AglScene {
                     Vec3 lightTransformAbsPos = lightTransform.getAbsolutePos(this);
                     Vec3 transformAbsPos = transform.getAbsolutePos(this);
 
-                    GLES20.glUniform3f(lightDirUniformLocation,
+                    GLES20.glUniform3f(lightPosUniformLocation,
                             lightTransformAbsPos.x - transformAbsPos.x,
                             lightTransformAbsPos.y - transformAbsPos.y,
                             lightTransformAbsPos.z - transformAbsPos.z);

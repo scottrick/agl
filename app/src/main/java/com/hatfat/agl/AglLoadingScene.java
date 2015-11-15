@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.hatfat.agl.app.AglApplication;
 import com.hatfat.agl.app.AglRenderer;
+import com.hatfat.agl.base.systems.TransformModifierSystem;
 import com.hatfat.agl.component.ModifierComponent;
 import com.hatfat.agl.component.RenderableComponent;
 import com.hatfat.agl.component.transform.Transform;
@@ -25,6 +26,8 @@ public class AglLoadingScene extends AglScene {
 
     public AglLoadingScene(Context context) {
         super(context, true);
+
+        addSystem(new TransformModifierSystem());
 
         AglApplication app = AglApplication.get(context);
         app.inject(this);

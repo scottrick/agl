@@ -9,7 +9,7 @@ varying vec2 outTexture;
 varying vec3 outTangent;
 varying vec3 outBitangent;
 
-uniform vec3 lightDir;
+uniform vec3 lightPos;
 uniform vec4 lightColor;
 uniform mat4 model;
 uniform mat4 view;
@@ -18,7 +18,7 @@ uniform sampler2D textureSampler;
 uniform sampler2D normalSampler;
 uniform sampler2D specularSampler;
 
-//texturing with normal map and blinn-phong lighting
+////texturing with normal map and blinn-phong lighting
 void main()
 {
     vec4 textureColor = texture2D(textureSampler, outTexture);
@@ -33,11 +33,14 @@ void main()
     mat3 TBN = mat3(outTangent, outBitangent, outNormal);
     normalToUse = TBN * normalToUse;
 
+    vec3 normal = normalize(normalToUse);
+    vec3 lightDir = normalize(lightPos - outPosition);
+
     //ambient
     float ambient = 0.2;
 
     //diffuse
-    float lambertian = max(dot(lightDir, normalToUse), 0.0);
+    float lambertian = max(dot(lightDir, normal), 0.0);
     float specular = 0.0;
 
     //specular
@@ -46,13 +49,12 @@ void main()
 
         // this is blinn phong specular component
         vec3 halfDir = normalize(lightDir + viewDir);
-        float specAngle = max(dot(halfDir, normalToUse), 0.0);
+        float specAngle = max(dot(halfDir, normal), 0.0);
         specular = pow(specAngle, 16.0);
     }
 
-    float colorMultiplier = ambient + lambertian;
-    vec4 color = lightColor * textureColor * colorMultiplier + specularColor * specular;
-    color = clamp(color, 0.0, 1.0);
+    float colorMultiplier = ambient + lambertian + specular;
+    vec4 colorLinear = lightColor * textureColor * colorMultiplier;
 
-    gl_FragColor = color;
+    gl_FragColor = colorLinear;
 }
