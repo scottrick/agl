@@ -38,7 +38,7 @@ uploadArchives {
             repository(url: "file:////Users/scottrick/.m2/repository")
             pom.groupId = 'com.hatfat.agl'
             pom.artifactId = 'agl-lib'
-            pom.version = '0.2.0'
+            pom.version = '0.2.1'
         }
     }
 }
