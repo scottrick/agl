@@ -1,8 +1,5 @@
 Agl TODO
 ---------------------------
-make aglTest icon
-make targeteer icon
-
 work on smoothness of animation 
 	vsync?  -easy to see on the dirt bumpmapped texture (agltest)
 	http://stackoverflow.com/questions/25107428/double-buffer-page-flipping-in-android-using-opengl-es-2-0

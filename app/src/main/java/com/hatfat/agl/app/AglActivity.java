@@ -3,19 +3,21 @@ package com.hatfat.agl.app;
 import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import com.hatfat.agl.base.AglScene;
 import com.hatfat.agl.R;
+import com.hatfat.agl.base.AglScene;
 import com.hatfat.agl.events.AglFpsUpdatedEvent;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import javax.inject.Inject;
 
-public class AglActivity extends Activity {
+public class AglActivity extends Activity implements View.OnTouchListener {
 
     @Inject
     Bus bus;
@@ -51,6 +53,8 @@ public class AglActivity extends Activity {
         fpsView = (TextView) findViewById(R.id.base_layout_fps_view);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        aglSurfaceView.setOnTouchListener(this);
     }
 
     @Override
@@ -103,5 +107,20 @@ public class AglActivity extends Activity {
 
     private void handleAglFpsUpdatedEvent(AglFpsUpdatedEvent event) {
         fpsView.setText(String.format(getResources().getString(R.string.fps_label_text), event.getFps()));
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        if (getScene() == null) {
+            return false;
+        }
+
+        GestureDetector gestureDetector = getScene().getGestureDetector();
+        if (gestureDetector == null) {
+            return false;
+        }
+
+        gestureDetector.onTouchEvent(event);
+        return true;
     }
 }

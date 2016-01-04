@@ -4,6 +4,7 @@ import android.content.Context;
 import android.opengl.GLES20;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.GestureDetector;
 
 import com.hatfat.agl.app.AglRenderer;
 import com.hatfat.agl.base.systems.CameraSystem;
@@ -138,6 +139,11 @@ public class AglScene {
 
     protected void setupSceneGLWork(AglRenderer renderer) {
         //override in subclass
+    }
+
+    /* return a gesture detector that will receive touch events for this scene */
+    public GestureDetector getGestureDetector() {
+        return null;
     }
 
     public void destroyScene(AglRenderer renderer) {
